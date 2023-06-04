@@ -6,9 +6,14 @@ export default defineConfig({
   main: {
     plugins: [
       externalizeDepsPlugin({
-        exclude: ['lowdb']
-      })
+        exclude: ['lowdb'],
+      }),
     ],
+    resolve: {
+      alias: {
+        '@main': resolve('./src/main'),
+      },
+    },
     build: {
       rollupOptions: {
         output: {
@@ -20,23 +25,28 @@ export default defineConfig({
           //   }
           //   return undefined
           // }
-        }
-      }
-    }
+        },
+      },
+    },
   },
   preload: {
+    resolve: {
+      alias: {
+        '@preload': resolve('./src/preload'),
+      },
+    },
     plugins: [
       externalizeDepsPlugin({
-        exclude: ['lowdb']
-      })
-    ]
+        exclude: ['lowdb'],
+      }),
+    ],
   },
   renderer: {
     resolve: {
       alias: {
-        '@renderer': resolve('src/renderer/src')
-      }
+        '@renderer': resolve('src/renderer/src'),
+      },
     },
-    plugins: [react()]
-  }
+    plugins: [react()],
+  },
 })

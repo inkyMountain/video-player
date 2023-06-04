@@ -1,9 +1,9 @@
 import { BrowserWindow } from 'electron'
 import { ipcMain } from 'electron-better-ipc'
 
-export const emitFileOpening = async (win: BrowserWindow) => {
-  await ipcMain.callRenderer<VideoIpc.OpenFileReq, VideoIpc.OpenFileRes>(
-    win,
-    'file-opening',
-  )
+export const emitOpenFile = async (
+  win: BrowserWindow,
+  data: VideoIpc.OpenFileReq,
+): Promise<VideoIpc.OpenFileRes> => {
+  return ipcMain.callRenderer(win, 'open-file', data)
 }

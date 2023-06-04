@@ -3,6 +3,6 @@
   "references": [{ "path": "./tsconfig.node.json" }, { "path": "./tsconfig.web.json" }],
   "include": ["./shared-types/**/*.d.ts"],
   "compilerOptions": {
-    "lib": ["ESNext"],
+    "lib": ["ESNext"]
   }
 }

@@ -5,7 +5,7 @@ import { RouterProvider } from 'react-router-dom'
 import router from './router'
 
 window.api.videoIpc.listenOpenFile(({ url }) => {
-  console.log('url ===========>', url)
+  alert(url)
   router.navigate({ pathname: `/video/player/${encodeURIComponent(url)}` })
 })
 

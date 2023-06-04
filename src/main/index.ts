@@ -2,12 +2,27 @@ import { app, shell, BrowserWindow } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
+import { emitOpenFile } from '@main/ipc-events/video'
 
-app.commandLine.appendSwitch('enable-features', 'PlatformHEVCDecoderSupport')
+const pendingFiles: string[] = []
+app.on('will-finish-launching', () => {
+  app.on('open-file', (event, url) => {
+    event.preventDefault()
+    // todo 修改为将文件路径 push 进 pendingFiles 数组，
+    // 然后在 app ready 事件中处理这些文件。
+    app.whenReady().then(() => {
+      const { win, loadPromise } = createWindow()
+      // 等 window 对象加载完页面后，再发送事件，让页面处理。
+      loadPromise.then(() => {
+        emitOpenFile(win, { url })
+      })
+    })
+  })
+})
 
-function createWindow(): void {
+function createWindow() {
   // Create the browser window.
-  const mainWindow = new BrowserWindow({
+  const win = new BrowserWindow({
     width: 900,
     height: 670,
     show: false,
@@ -19,21 +34,26 @@ function createWindow(): void {
     },
   })
 
-  mainWindow.on('ready-to-show', () => {
-    mainWindow.show()
+  win.on('ready-to-show', () => {
+    win.show()
   })
 
-  mainWindow.webContents.setWindowOpenHandler((details) => {
+  win.webContents.setWindowOpenHandler((details) => {
     shell.openExternal(details.url)
     return { action: 'deny' }
   })
 
   // HMR for renderer base on electron-vite cli.
   // Load the remote URL for development or the local html file for production.
+  let loadPromise: Promise<void>
   if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
-    mainWindow.loadURL(process.env['ELECTRON_RENDERER_URL'])
+    loadPromise = win.loadURL(process.env['ELECTRON_RENDERER_URL'])
   } else {
-    mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
+    loadPromise = win.loadFile(join(__dirname, '../renderer/index.html'))
+  }
+  return {
+    win,
+    loadPromise,
   }
 }
 
@@ -42,7 +62,7 @@ function createWindow(): void {
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(() => {
   // Set app user model id for windows
-  electronApp.setAppUserModelId('com.electron')
+  electronApp.setAppUserModelId('peer-video-player')
 
   // Default open or close DevTools by F12 in development
   // and ignore CommandOrControl + R in production.
@@ -51,12 +71,16 @@ app.whenReady().then(() => {
     optimizer.watchWindowShortcuts(window)
   })
 
-  createWindow()
+  if (BrowserWindow.getAllWindows().length === 0) {
+    createWindow()
+  }
 
   app.on('activate', function () {
     // On macOS it's common to re-create a window in the app when the
     // dock icon is clicked and there are no other windows open.
-    if (BrowserWindow.getAllWindows().length === 0) createWindow()
+    if (BrowserWindow.getAllWindows().length === 0) {
+      createWindow()
+    }
   })
 })
 

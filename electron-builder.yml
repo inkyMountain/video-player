@@ -1,5 +1,5 @@
-appId: com.electron.app
-productName: video-player
+appId: com.peer-video-player.app
+productName: peer-video-player
 directories:
   buildResources: build
 files:
