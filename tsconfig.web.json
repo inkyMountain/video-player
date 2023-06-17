@@ -10,6 +10,7 @@
     "composite": true,
     "jsx": "react-jsx",
     "baseUrl": ".",
+    "lib": ["DOM", "ESNext"],
     "paths": {
       "@renderer/*": [
         "src/renderer/src/*"

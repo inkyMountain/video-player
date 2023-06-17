@@ -6,7 +6,7 @@ export default defineConfig({
   main: {
     plugins: [
       externalizeDepsPlugin({
-        exclude: ['lowdb'],
+        exclude: ['lowdb', 'globby'],
       }),
     ],
     resolve: {

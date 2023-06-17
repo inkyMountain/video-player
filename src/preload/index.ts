@@ -1,9 +1,11 @@
 import { contextBridge } from 'electron'
 import { ElectronAPI, electronAPI } from '@electron-toolkit/preload'
 import videoIpc from './video'
+import fileIpc from './localFile'
 
 const api = {
   videoIpc,
+  fileIpc,
 }
 
 // 根据是否开启 contextIsolated，来采取不同的 api 注入方式。

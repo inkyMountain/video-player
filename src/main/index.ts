@@ -1,35 +1,50 @@
 import { app, shell, BrowserWindow } from 'electron'
-import { join } from 'path'
-import { electronApp, optimizer, is } from '@electron-toolkit/utils'
+import { electronApp, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import { emitOpenFile } from '@main/ipc-events/video'
+import electronDebug from 'electron-debug'
+import path from 'path'
+import ipcMiddleware from '@main/middlewares/ipc'
+import { AppMiddleware } from './middlewares/types'
 
-const pendingFiles: string[] = []
+const applyMiddleware = ({ apply, when }: AppMiddleware) => {
+  if (is.dev && (when === 'dev' || when === 'all')) {
+    apply()
+  } else if (!is.dev && (when === 'production' || when === 'all')) {
+    apply()
+  }
+}
+
+applyMiddleware(ipcMiddleware)
+
+if (is.dev) {
+  electronDebug()
+}
+
+const pendingFiles: Array<{ url: string }> = []
 app.on('will-finish-launching', () => {
   app.on('open-file', (event, url) => {
     event.preventDefault()
-    // todo 修改为将文件路径 push 进 pendingFiles 数组，
-    // 然后在 app ready 事件中处理这些文件。
-    app.whenReady().then(() => {
-      const { win, loadPromise } = createWindow()
-      // 等 window 对象加载完页面后，再发送事件，让页面处理。
-      loadPromise.then(() => {
-        emitOpenFile(win, { url })
-      })
-    })
+    pendingFiles.push({ url })
   })
 })
 
+// 创建一个应用窗口，加载 html 文件。
 function createWindow() {
-  // Create the browser window.
   const win = new BrowserWindow({
-    width: 900,
+    width: 1200,
+
     height: 670,
     show: false,
     autoHideMenuBar: true,
+    titleBarStyle: 'hidden',
+    titleBarOverlay: {
+      color: '#ffff00',
+      symbolColor: '#00ffff',
+    },
     ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
-      preload: join(__dirname, '../preload/index.js'),
+      preload: path.join(__dirname, '../preload/index.js'),
       sandbox: false,
     },
   })
@@ -43,56 +58,61 @@ function createWindow() {
     return { action: 'deny' }
   })
 
-  // HMR for renderer base on electron-vite cli.
-  // Load the remote URL for development or the local html file for production.
-  let loadPromise: Promise<void>
-  if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
-    loadPromise = win.loadURL(process.env['ELECTRON_RENDERER_URL'])
-  } else {
-    loadPromise = win.loadFile(join(__dirname, '../renderer/index.html'))
-  }
+  // 生产环境和开发环境加载不同的 url。
+  // 开发环境是加载一个 http 链接，生产环境是加载 file:// 链接。
+  const loadPromise =
+    is.dev && process.env['ELECTRON_RENDERER_URL']
+      ? win.loadURL(process.env['ELECTRON_RENDERER_URL'])
+      : win.loadFile(path.join(__dirname, '../renderer/index.html'))
   return {
     win,
     loadPromise,
   }
 }
 
-// This method will be called when Electron has finished
-// initialization and is ready to create browser windows.
-// Some APIs can only be used after this event occurs.
+// 当 electron app 已经准备好，可以创建应用窗口以后，就会触发这里的事件。
 app.whenReady().then(() => {
   // Set app user model id for windows
   electronApp.setAppUserModelId('peer-video-player')
 
-  // Default open or close DevTools by F12 in development
-  // and ignore CommandOrControl + R in production.
   // see https://github.com/alex8088/electron-toolkit/tree/master/packages/utils
-  app.on('browser-window-created', (_, window) => {
-    optimizer.watchWindowShortcuts(window)
-  })
+  // 这里做了两件事情：1. 开发阶段绑定了 f12 打开开发工具的快捷键。 2. 生产阶段禁用 ctrl/command+r 刷新页面。
+  // app.on('browser-window-created', (_, window) => {
+  //   optimizer.watchWindowShortcuts(window)
+  // })
 
   if (BrowserWindow.getAllWindows().length === 0) {
     createWindow()
   }
 
+  while (pendingFiles.length > 0) {
+    const file = pendingFiles.shift()
+    if (!file) {
+      break
+    }
+    const { win, loadPromise } = createWindow()
+    // 等 window 对象加载完页面后，再发送事件，让页面处理。
+    loadPromise.then(() => {
+      emitOpenFile(win, { url: file.url })
+    })
+  }
+
   app.on('activate', function () {
-    // On macOS it's common to re-create a window in the app when the
-    // dock icon is clicked and there are no other windows open.
+    // activate 事件只有 macos 上会触发。
+    // 当所有的窗口被关闭后，再次点击 dock 栏图标，则需要创建一个新的窗口。
     if (BrowserWindow.getAllWindows().length === 0) {
       createWindow()
     }
   })
 })
 
-// Quit when all windows are closed, except on macOS. There, it's common
-// for applications and their menu bar to stay active until the user quits
-// explicitly with Cmd + Q.
-
+/**
+ * 在 windows 系统中，当所有窗口被关闭了，那么就退出 app。
+ * 在 macos 系统中，即使窗口都被关闭了，也应该保留 app 不退出。
+ *   这样用户可以通过点击托盘，或者 dock 栏，触发 activate 事件，再次创建应用窗口。
+ */
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     app.quit()
   }
 })
-
-// In this file you can include the rest of your app"s specific main process
-// code. You can also put them in separate files and require them here.

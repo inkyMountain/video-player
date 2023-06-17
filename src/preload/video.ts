@@ -1,9 +1,9 @@
 import { ipcRenderer } from 'electron-better-ipc'
 
 const listenOpenFile = (
-  callback: (data: VideoIpc.OpenFileReq) => VideoIpc.OpenFileRes,
+  callback: (data: VideoIpc.OpenVideoReq) => VideoIpc.OpenVideoRes,
 ) => {
-  return ipcRenderer.answerMain('open-file', callback)
+  return ipcRenderer.answerMain('open-video', callback)
 }
 
 const videoIpc = {

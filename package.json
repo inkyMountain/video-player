@@ -22,12 +22,23 @@
   "dependencies": {
     "@electron-toolkit/preload": "^1.0.3",
     "@electron-toolkit/utils": "^1.0.2",
+    "@types/fluent-ffmpeg": "^2.1.21",
+    "@types/wicg-file-system-access": "^2020.9.6",
+    "ahooks": "^3.7.7",
     "electron-better-ipc": "^2.0.1",
     "electron-debug": "^3.2.0",
     "electron-reloader": "^1.2.3",
     "electron-updater": "^5.3.0",
+    "fluent-ffmpeg": "^2.1.2",
+    "globby": "^13.1.4",
+    "lowdb": "^6.0.1",
     "react-router-dom": "^6.11.2",
-    "video.js": "^8.3.0"
+    "rip-subtitles": "^0.0.1",
+    "sass": "^1.63.3",
+    "subtitle": "^4.2.1",
+    "use-immer": "^0.9.0",
+    "video.js": "^8.3.0",
+    "zustand": "^4.3.8"
   },
   "devDependencies": {
     "@electron-toolkit/tsconfig": "^1.0.1",
