@@ -1,14 +1,31 @@
 import { FC, PropsWithChildren } from 'react'
-import videojs from 'video.js'
-import 'video.js/dist/video-js.min.css'
+import './App.scss'
+import { useAsyncEffect } from 'ahooks'
+import usePlaylistStore from './store/playlist'
+import router from './router'
 
 const App: FC<PropsWithChildren> = ({ children }) => {
-  // useEffect(() => {
-  //   const player = videojs('video', { errorDisplay: false, controls: true })
-  //   player.play()
-  // }, [])
+  const playlistStore = usePlaylistStore()
+  useAsyncEffect(async () => {
+    const { playlists: latestPlaylists } =
+      await window.api.fileIpc.emitGetPlaylists()
+    playlistStore.setPlaylists(latestPlaylists)
+  }, [])
 
-  return <div id="container">{children}</div>
+  return (
+    <div id="container">
+      <header className="draggable-bar" />
+      {/* 返回按钮 */}
+      <button
+        onClick={() => {
+          router.navigate(-1)
+        }}
+      >
+        back
+      </button>
+      {children}
+    </div>
+  )
 }
 
 export default App

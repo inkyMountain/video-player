@@ -5,7 +5,10 @@ import { RouterProvider } from 'react-router-dom'
 import router from './router'
 
 window.api.videoIpc.listenOpenFile(({ url }) => {
-  router.navigate({ pathname: `/video/player/${encodeURIComponent(url)}` })
+  const searchParams = new URLSearchParams({
+    filePath: encodeURIComponent(url),
+  })
+  router.navigate({ pathname: `/video/player?${searchParams.toString()}` })
 })
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(

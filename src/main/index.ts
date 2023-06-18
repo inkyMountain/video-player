@@ -5,6 +5,7 @@ import { emitOpenFile } from '@main/ipc-events/video'
 import electronDebug from 'electron-debug'
 import path from 'path'
 import ipcMiddleware from '@main/middlewares/ipc'
+import protocolMiddleware from '@main/middlewares/protocol'
 import { AppMiddleware } from './middlewares/types'
 
 const applyMiddleware = ({ apply, when }: AppMiddleware) => {
@@ -16,6 +17,7 @@ const applyMiddleware = ({ apply, when }: AppMiddleware) => {
 }
 
 applyMiddleware(ipcMiddleware)
+applyMiddleware(protocolMiddleware)
 
 if (is.dev) {
   electronDebug()
@@ -34,7 +36,7 @@ function createWindow() {
   const win = new BrowserWindow({
     width: 1200,
 
-    height: 670,
+    height: 1000,
     show: false,
     autoHideMenuBar: true,
     titleBarStyle: 'hidden',

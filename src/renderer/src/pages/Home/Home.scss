@@ -1,13 +1,9 @@
 .home {
-  .draggable-bar {
-    height: 200px;
-    background-color: lightblue;
-    -webkit-app-region: drag;
-  }
-
   .playlists {
     .playlist {
       display: flex;
+      cursor: pointer;
+      padding: 10px;
       .folder-path {
       }
       .folder-name {

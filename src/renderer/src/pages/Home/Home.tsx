@@ -1,6 +1,5 @@
 import React, { useMemo } from 'react'
 import './Home.scss'
-import { useAsyncEffect } from 'ahooks'
 import usePlaylistStore from '@renderer/store/playlist'
 import { useNavigate } from 'react-router-dom'
 
@@ -26,15 +25,8 @@ const Home: React.FunctionComponent<IProps> = (props) => {
     )
   }, [playlistStore.playlists])
 
-  useAsyncEffect(async () => {
-    const { playlists: latestPlaylists } =
-      await window.api.fileIpc.emitGetPlaylists()
-    playlistStore.setPlaylists(latestPlaylists)
-  }, [])
-
   return (
     <div className="home">
-      <header className="draggable-bar"></header>
       <main className="playlists">
         {playlistStore.playlists.map(({ folderName, folderPath, files }) => {
           return (

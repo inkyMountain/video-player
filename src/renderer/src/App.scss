@@ -1,0 +1,7 @@
+#container {
+  .draggable-bar {
+    height: 30px;
+    background-color: lightblue;
+    -webkit-app-region: drag;
+  }
+}

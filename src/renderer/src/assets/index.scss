@@ -5,6 +5,15 @@ body {
     'Segoe UI', 'Oxygen', 'Ubuntu', 'Cantarell', 'Open Sans', sans-serif;
 }
 
+@media (prefers-color-scheme: dark) {
+  body {
+    background-color: black;
+  }
+  body * {
+    color: gray;
+  }
+}
+
 * {
   padding: 0;
   margin: 0;
@@ -122,4 +131,14 @@ a:hover {
 
 .links .link-item {
   padding: 0 4px;
+}
+
+button {
+  background-color: transparent;
+  appearance: none;
+  outline: none;
+  box-shadow: none;
+  border: gray 1px solid;
+  border-radius: 4px;
+  margin-right: 4px;
 }
