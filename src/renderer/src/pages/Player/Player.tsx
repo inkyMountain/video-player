@@ -6,7 +6,7 @@ import '@videojs/themes/dist/city/index.css'
 import '@videojs/themes/dist/sea/index.css'
 import '@videojs/themes/dist/fantasy/index.css'
 import '@videojs/themes/dist/forest/index.css'
-import { useSearchParams } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import classnames from 'classnames'
 import { useImmer } from 'use-immer'
 import Player from 'video.js/dist/types/player'
@@ -15,6 +15,7 @@ import { useFullscreen } from 'ahooks'
 const VideoPlayer: FC<{}> = () => {
   const videoRef = useRef<HTMLVideoElement>(null)
   const player = useRef<Player>()
+  const navigate = useNavigate()
 
   const [isFullscreen, { enterFullscreen, exitFullscreen, toggleFullscreen }] =
     useFullscreen(videoRef.current, {})
@@ -84,6 +85,15 @@ const VideoPlayer: FC<{}> = () => {
       ) : (
         '无视频地址'
       )}
+
+      <button
+        className="close-button"
+        onClick={() => {
+          navigate(-1)
+        }}
+      >
+        关闭
+      </button>
     </div>
   )
 }
