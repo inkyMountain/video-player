@@ -15,6 +15,9 @@ declare namespace FileIpc {
   }
   export type RevealDbFileReq = {} | void
   export type RevealDbFileRes = void
+
+  export type SetWindowSizeReq = { width: number; height: number }
+  export type SetWindowSizeRes = void
 }
 
 interface PlaylistLocation {

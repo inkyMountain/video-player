@@ -35,11 +35,10 @@ app.on('will-finish-launching', () => {
 function createWindow() {
   const win = new BrowserWindow({
     width: 1200,
-
     height: 1000,
     show: false,
     autoHideMenuBar: true,
-    titleBarStyle: 'hidden',
+    titleBarStyle: 'customButtonsOnHover',
     titleBarOverlay: {
       color: '#ffff00',
       symbolColor: '#00ffff',

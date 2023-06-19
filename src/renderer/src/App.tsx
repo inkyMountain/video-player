@@ -14,15 +14,15 @@ const App: FC<PropsWithChildren> = ({ children }) => {
 
   return (
     <div id="container">
-      <header className="draggable-bar" />
+      {/* <header className="draggable-bar" /> */}
       {/* 返回按钮 */}
-      <button
+      {/* <button
         onClick={() => {
           router.navigate(-1)
         }}
       >
         back
-      </button>
+      </button> */}
       {children}
     </div>
   )

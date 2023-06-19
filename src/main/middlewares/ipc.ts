@@ -66,6 +66,10 @@ const ipcMiddleware: AppMiddleware = {
       localFileIpc.onRevealDbFile(async () => {
         shell.showItemInFolder(appConfigDbPath)
       })
+
+      localFileIpc.onSetWindowSize(async ({ width, height }, win) => {
+        win?.setSize(width, height, true)
+      })
     })
   },
 }

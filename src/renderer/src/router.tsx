@@ -3,7 +3,7 @@ import {
   createBrowserRouter,
   createHashRouter,
 } from 'react-router-dom'
-import Player from './pages/Player/Player'
+import VideoPlayer from './pages/Player/Player'
 import History from './pages/History/History'
 import Home from './pages/Home/Home'
 import PlaylistDetail from './pages/PlaylistDetail/PlaylistDetail'
@@ -18,7 +18,7 @@ const routes: Array<RouteObject> = [
     path: 'playlist-detail/:folderPath',
   },
   {
-    element: <Player />,
+    element: <VideoPlayer />,
     path: 'video/player',
   },
   {

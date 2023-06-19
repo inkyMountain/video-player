@@ -1,21 +1,34 @@
 import { ipcRenderer } from 'electron-better-ipc'
 
-const emitAddFolder = (): Promise<FileIpc.AddLocalFolderRes> => {
-  return ipcRenderer.callMain('add-local-folder')
+const emitAddFolder = (
+  data: FileIpc.AddLocalFolderReq,
+): Promise<FileIpc.AddLocalFolderRes> => {
+  return ipcRenderer.callMain('add-local-folder', data)
 }
 
-const emitGetPlaylists = (): Promise<FileIpc.GetPlaylistsRes> => {
-  return ipcRenderer.callMain('get-playlists')
+const emitGetPlaylists = (
+  data: FileIpc.GetPlaylistsReq,
+): Promise<FileIpc.GetPlaylistsRes> => {
+  return ipcRenderer.callMain('get-playlists', data)
 }
 
-const emitRevealDbFile = (): Promise<FileIpc.RevealDbFileRes> => {
-  return ipcRenderer.callMain('reveal-db-file')
+const emitRevealDbFile = (
+  data: FileIpc.RevealDbFileReq,
+): Promise<FileIpc.RevealDbFileRes> => {
+  return ipcRenderer.callMain('reveal-db-file', data)
+}
+
+const emitSetWindowSize = (
+  data: FileIpc.SetWindowSizeReq,
+): Promise<FileIpc.SetWindowSizeRes> => {
+  return ipcRenderer.callMain('set-window-size', data)
 }
 
 const fileIpc = {
   emitAddFolder,
   emitGetPlaylists,
   emitRevealDbFile,
+  emitSetWindowSize,
 }
 
 export default fileIpc
