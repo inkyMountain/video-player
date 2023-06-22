@@ -38,6 +38,7 @@ const ipcMiddleware: AppMiddleware = {
       localFileIpc.onGetPlaylists(async () => {
         await appDataDb.read()
         const locations = appDataDb.data.playlistLocations ?? []
+        console.log('locations ==========>', locations)
         const playlistDetailCollectResults = locations.map((location) => {
           if (!location.folderPath) {
             return Promise.reject()

@@ -1,6 +1,47 @@
 import { globby } from 'globby'
 import ffmpeg from 'fluent-ffmpeg'
 import path from 'path'
+import log from 'electron-log'
+
+const ffmpegBinName =
+  process.platform === 'win32' ? 'ffmpeg.exe' : 'ffmpeg-universal'
+const ffmpegBinPath =
+  process.env.NODE_ENV === 'development'
+    ? path.join(process.cwd(), `resources/ffmpeg-binaries/${ffmpegBinName}`)
+    : path.join(process.resourcesPath, ffmpegBinName)
+const ffprobeBinName =
+  process.platform === 'win32' ? 'ffprobe.exe' : 'ffprobe-universal'
+const ffprobeBinPath =
+  process.env.NODE_ENV === 'development'
+    ? path.join(process.cwd(), `resources/ffmpeg-binaries/${ffprobeBinName}`)
+    : path.join(process.resourcesPath, ffprobeBinName)
+
+log.info(`
+NODE_ENV: ${process.env.NODE_ENV}
+ffmpeg路径:${ffmpegBinPath},
+ffprobe路径:${ffprobeBinPath},
+`)
+ffmpeg.setFfmpegPath(ffmpegBinPath)
+ffmpeg.setFfprobePath(ffprobeBinPath)
+ffmpeg.getAvailableCodecs((err, codecs) => {
+  if (err) {
+    log.error('获取ffmpeg支持编码出错', err)
+  } else {
+    log.info('获取ffmpeg支持编码成功')
+  }
+})
+
+// const ffmpegPath = (ffmpegBinPath ?? '').replace(
+//   'app.asar',
+//   'app.asar.unpacked',
+// )
+// const ffprobePath = ffprobeBinPath.path.replace('app.asar', 'app.asar.unpacked')
+// ffmpeg.setFfmpegPath(ffmpegPath)
+// ffmpeg.setFfprobePath(ffprobePath)
+// log.info(`
+// ffmpeg路径：${ffmpegPath}
+// ffprobe路径：${ffprobePath}
+// `)
 
 const ffprobe = (filePath: string) => {
   return new Promise<ffmpeg.FfprobeData>((resolve, reject) => {

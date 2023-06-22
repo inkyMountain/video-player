@@ -8,6 +8,7 @@ interface IProps {}
 const Home: React.FunctionComponent<IProps> = (props) => {
   const navigate = useNavigate()
   const playlistStore = usePlaylistStore()
+  console.log('playlistStore ===========>', playlistStore)
 
   const gotoPlaylistDetailPage = (folderPath: string) => {
     navigate(`/playlist-detail/${encodeURIComponent(folderPath)}`)

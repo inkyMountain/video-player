@@ -32,6 +32,9 @@ dependencies:
   electron-debug:
     specifier: ^3.2.0
     version: 3.2.0
+  electron-log:
+    specifier: ^4.4.8
+    version: 4.4.8
   electron-reloader:
     specifier: ^1.2.3
     version: 1.2.3
@@ -1978,6 +1981,10 @@ packages:
       keyboardevents-areequal: 0.2.2
     transitivePeerDependencies:
       - supports-color
+    dev: false
+
+  /electron-log@4.4.8:
+    resolution: {integrity: sha512-QQ4GvrXO+HkgqqEOYbi+DHL7hj5JM+nHi/j+qrN9zeeXVKy8ZABgbu4CnG+BBqDZ2+tbeq9tUC4DZfIWFU5AZA==}
     dev: false
 
   /electron-osx-sign@0.6.0:

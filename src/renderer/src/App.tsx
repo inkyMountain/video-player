@@ -9,6 +9,7 @@ const App: FC<PropsWithChildren> = ({ children }) => {
   useAsyncEffect(async () => {
     const { playlists: latestPlaylists } =
       await window.api.fileIpc.emitGetPlaylists()
+    console.log('latestPlaylists ===========>', latestPlaylists)
     playlistStore.setPlaylists(latestPlaylists)
   }, [])
 
