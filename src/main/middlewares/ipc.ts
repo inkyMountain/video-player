@@ -10,13 +10,14 @@ const ipcMiddleware: AppMiddleware = {
   apply() {
     app.whenReady().then(() => {
       localFileIpc.onAddLocalFolder(async () => {
-        const emptyResult = { folderPath: '', folderName: '', files: [] }
         const { canceled, filePaths } = await dialog.showOpenDialog({
           title: '添加一个包含视频的文件夹',
           properties: ['openDirectory'],
         })
+        console.log('filePaths ==========>', filePaths)
+        console.log('canceled ==========>', canceled)
         if (canceled) {
-          return emptyResult
+          return null
         }
         const folderPath = filePaths[0]
         // 将用户选择的文件夹路径，存储到文件数据库中。
@@ -26,40 +27,19 @@ const ipcMiddleware: AppMiddleware = {
         if (!isDuplicate) {
           appDataDb.data.playlistLocations.push({ folderPath })
           await appDataDb.write()
-          return fileUtils.getVideosStatsIn(
+          return {
             folderPath,
-            SUPPORTED_VIDEO_EXTENSIONS,
-          )
+          }
         }
 
-        return emptyResult
+        return null
       })
 
-      localFileIpc.onGetPlaylists(async () => {
+      localFileIpc.onGetPlaylistLocations(async () => {
         await appDataDb.read()
         const locations = appDataDb.data.playlistLocations ?? []
-        const playlistDetailCollectResults = locations.map((location) => {
-          if (!location.folderPath) {
-            return Promise.reject()
-          }
-          return fileUtils.getVideosStatsIn(
-            location.folderPath,
-            SUPPORTED_VIDEO_EXTENSIONS,
-          )
-        })
-        const results = await Promise.allSettled(playlistDetailCollectResults)
-        const playlists = results
-          .filter((result) => result.status === 'fulfilled')
-          .map((result) => {
-            return (
-              result as {
-                value: Common.Playlist
-                status: 'fulfilled'
-              }
-            ).value
-          })
         return {
-          playlistLocations: playlists,
+          playlistLocations: locations,
         }
       })
 
@@ -80,6 +60,21 @@ const ipcMiddleware: AppMiddleware = {
 
       localFileIpc.onSetWindowSize(async ({ width, height }, win) => {
         win?.setSize(width, height, true)
+      })
+
+      localFileIpc.onDeletePlaylistLocation(async ({ folderPath }) => {
+        console.log('folderPath ==========>', folderPath)
+        await appDataDb.read()
+        const playlistLocations = appDataDb.data.playlistLocations
+        const index = playlistLocations.findIndex(
+          (location) => location.folderPath === folderPath,
+        )
+        console.log('index ==========>', index)
+        if (index === -1) {
+          return
+        }
+        playlistLocations.splice(index, 1)
+        await appDataDb.write()
       })
     })
   },

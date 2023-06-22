@@ -51,7 +51,7 @@ const getVideosStatsIn = async (folderPath: string, extensions: string[]) => {
   const videoFiles = await globVideosIn(folderPath, extensions)
   const res = await Promise.all(videoFiles.map((filePath) => ffprobe(filePath)))
 
-  const result: FileIpc.AddLocalFolderRes = {
+  const result: Common.Playlist = {
     folderPath,
     folderName: path.basename(folderPath),
     files: res.map((stat) => {

@@ -4,7 +4,7 @@ import { immer } from 'zustand/middleware/immer'
 interface PlaylistStore {
   playlistLocations: Array<Common.PlaylistLocation>
   setPlaylistLocations: (playlists: Array<Common.PlaylistLocation>) => void
-  pushPlaylistLocations: (playlist: Common.PlaylistLocation) => void
+  pushPlaylistLocation: (playlist: Common.PlaylistLocation) => void
   clearPlaylistLocations: () => void
 
   playlists: Record<string, Common.Playlist>
@@ -22,7 +22,7 @@ const usePlaylistStore = create(
           store.playlistLocations = newPlaylists
         })
       },
-      pushPlaylistLocations(newPlaylist) {
+      pushPlaylistLocation(newPlaylist) {
         set(({ playlistLocations: playlists }) => {
           playlists.push(newPlaylist)
         })

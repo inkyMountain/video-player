@@ -10,7 +10,7 @@ const onAddLocalFolder = async (
   return ipcMain.answerRenderer('add-local-folder', callback)
 }
 
-const onGetPlaylists = async (
+const onGetPlaylistLocations = async (
   callback: (
     data: FileIpc.GetPlaylistsReq,
     win?: BrowserWindow,
@@ -46,12 +46,22 @@ const onGetPlaylistAt = async (
   return ipcMain.answerRenderer('get-playlist-at', callback)
 }
 
+const onDeletePlaylistLocation = async (
+  callback: (
+    data: FileIpc.DeletePlaylistLocationReq,
+    win?: BrowserWindow,
+  ) => Promise<FileIpc.DeletePlaylistLocationRes>,
+) => {
+  return ipcMain.answerRenderer('delete-playlist-location', callback)
+}
+
 const localFileIpc = {
   onAddLocalFolder,
-  onGetPlaylists,
+  onGetPlaylistLocations,
   onRevealDbFile,
   onSetWindowSize,
   onGetPlaylistAt,
+  onDeletePlaylistLocation,
 }
 
 export default localFileIpc

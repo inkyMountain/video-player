@@ -8,7 +8,7 @@ import '@videojs/themes/dist/forest/index.css'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import classnames from 'classnames'
 import Player from 'video.js/dist/types/player'
-import { useFullscreen } from 'ahooks'
+import { useFullscreen, useMemoizedFn } from 'ahooks'
 import NavigationBar from '@renderer/components/NavigationBar/NavigationBar'
 
 const VideoPlayer: FC<{}> = () => {
@@ -52,6 +52,14 @@ const VideoPlayer: FC<{}> = () => {
   const searchParamsMap = new Map(searchParams.entries())
   const filePath = searchParamsMap.get('filePath')
 
+  const togglePlayState = useMemoizedFn(() => {
+    if (videoRef.current?.paused) {
+      videoRef.current?.play()
+    } else {
+      videoRef.current?.pause()
+    }
+  })
+
   return (
     <div className="player">
       <header className="navigation-bar-wrapper">
@@ -60,17 +68,14 @@ const VideoPlayer: FC<{}> = () => {
       {filePath ? (
         <video
           onDoubleClick={() => {
-            alert(isFullscreen)
             toggleFullscreen()
           }}
           onContextMenu={() => {
-            if (videoRef.current?.paused) {
-              videoRef.current?.play()
-            } else {
-              videoRef.current?.pause()
-            }
+            togglePlayState()
           }}
-          onClick={(event) => {}}
+          onClick={() => {
+            togglePlayState()
+          }}
           className={classnames(
             'video-js',
             'vjs-theme-sea',

@@ -2,6 +2,7 @@ import React, { useMemo } from 'react'
 import './Home.scss'
 import usePlaylistStore from '@renderer/store/playlist'
 import { useNavigate } from 'react-router-dom'
+import NavigationBar from '@renderer/components/NavigationBar/NavigationBar'
 
 interface IProps {}
 
@@ -27,8 +28,10 @@ const Home: React.FunctionComponent<IProps> = (props) => {
 
   return (
     <div className="home">
+      <NavigationBar backButtonVisible={false} />
       <main className="playlists">
-        {playlistStore.playlistLocations.map(({ folderPath }) => {
+        {playlistStore.playlistLocations.map((location) => {
+          const { folderPath } = location
           return (
             <article
               className="playlist"
@@ -39,7 +42,26 @@ const Home: React.FunctionComponent<IProps> = (props) => {
               }}
               key={folderPath}
             >
-              <div className="folder-path">{folderPath}</div>
+              <div className="folder-path">
+                <div className="path-text">{folderPath}</div>
+                <button
+                  className="delete-button"
+                  onClick={async (event) => {
+                    event.stopPropagation()
+                    if (!folderPath) {
+                      return
+                    }
+                    await window.api.fileIpc.emitDeletePlaylistLocation(
+                      location,
+                    )
+                    const { playlistLocations: latestPlaylistLocations } =
+                      await window.api.fileIpc.emitGetPlaylists()
+                    playlistStore.setPlaylistLocations(latestPlaylistLocations)
+                  }}
+                >
+                  删除
+                </button>
+              </div>
             </article>
           )
         })}
@@ -47,14 +69,13 @@ const Home: React.FunctionComponent<IProps> = (props) => {
 
       <button
         onClick={async () => {
-          const addedPlaylists = await window.api.fileIpc.emitAddFolder()
+          const addedPlaylistLocation = await window.api.fileIpc.emitAddFolder()
           if (
-            addedPlaylists.folderPath &&
-            !folderPathSet.has(addedPlaylists.folderPath)
+            addedPlaylistLocation !== null &&
+            addedPlaylistLocation !== undefined
           ) {
-            playlistStore.pushPlaylistLocations(addedPlaylists)
+            playlistStore.pushPlaylistLocation(addedPlaylistLocation)
           }
-          console.log('res ===========>', addedPlaylists)
         }}
       >
         选择文件夹

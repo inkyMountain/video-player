@@ -30,12 +30,19 @@ const emitGetPlaylistAt = (
   return ipcRenderer.callMain('get-playlist-at', data)
 }
 
+const emitDeletePlaylistLocation = (
+  data: FileIpc.DeletePlaylistLocationReq,
+): Promise<FileIpc.DeletePlaylistLocationRes> => {
+  return ipcRenderer.callMain('delete-playlist-location', data)
+}
+
 const fileIpc = {
   emitAddFolder,
   emitGetPlaylists,
   emitRevealDbFile,
   emitSetWindowSize,
   emitGetPlaylistAt,
+  emitDeletePlaylistLocation,
 }
 
 export default fileIpc

@@ -7,7 +7,7 @@ declare namespace VideoIpc {
 
 declare namespace FileIpc {
   export type AddLocalFolderReq = {} | void
-  export type AddLocalFolderRes = Common.Playlist
+  export type AddLocalFolderRes = Common.PlaylistLocation | null
 
   export type GetPlaylistsReq = {} | void
   export type GetPlaylistsRes = {
@@ -21,4 +21,7 @@ declare namespace FileIpc {
 
   export type GetPlaylistAtReq = Common.PlaylistLocation
   export type GetPlaylistAtRes = Common.Playlist | null
+
+  export type DeletePlaylistLocationReq = Common.PlaylistLocation
+  export type DeletePlaylistLocationRes = void
 }

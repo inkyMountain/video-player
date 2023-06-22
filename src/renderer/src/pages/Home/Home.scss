@@ -5,6 +5,18 @@
       cursor: pointer;
       padding: 10px;
       .folder-path {
+        display: flex;
+        align-items: center;
+        .path-text {
+        }
+        .delete-button {
+          opacity: 0;
+          transition: opacity ease 0.2s;
+          margin-left: 10px;
+        }
+        &:hover .delete-button {
+          opacity: 1;
+        }
       }
       .folder-name {
       }
