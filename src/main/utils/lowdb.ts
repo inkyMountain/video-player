@@ -10,7 +10,7 @@ export const appConfigDbPath = path.join(
 )
 
 interface AppDataDb {
-  playlistLocations: Array<PlaylistLocation>
+  playlistLocations: Array<Common.PlaylistLocation>
 }
 const jsonAdapter = new JSONFile<AppDataDb>(appConfigDbPath)
 const appDataDb = new Low(jsonAdapter, {

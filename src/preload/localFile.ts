@@ -24,11 +24,18 @@ const emitSetWindowSize = (
   return ipcRenderer.callMain('set-window-size', data)
 }
 
+const emitGetPlaylistAt = (
+  data: FileIpc.GetPlaylistAtReq,
+): Promise<FileIpc.GetPlaylistAtRes> => {
+  return ipcRenderer.callMain('get-playlist-at', data)
+}
+
 const fileIpc = {
   emitAddFolder,
   emitGetPlaylists,
   emitRevealDbFile,
   emitSetWindowSize,
+  emitGetPlaylistAt,
 }
 
 export default fileIpc

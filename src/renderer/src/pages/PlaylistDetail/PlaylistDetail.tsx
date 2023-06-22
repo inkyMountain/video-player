@@ -1,7 +1,8 @@
 import usePlaylistStore from '@renderer/store/playlist'
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import './PlaylistDetail.scss'
+import { useAsyncEffect } from 'ahooks'
 
 interface IProps {}
 
@@ -9,9 +10,25 @@ const PlaylistDetail: React.FunctionComponent<IProps> = (props) => {
   const pathParams = useParams<{ folderPath: string }>()
   const navigate = useNavigate()
   const playlistStore = usePlaylistStore()
-  const currentPlaylist = playlistStore.playlists.find(
-    (playlist) => playlist.folderPath === pathParams.folderPath,
-  )
+
+  const folderPath = pathParams.folderPath
+  useAsyncEffect(async () => {
+    if (!folderPath) {
+      return
+    }
+    const playlistDetail = playlistStore.playlists[folderPath]
+    if (playlistDetail) {
+      return
+    }
+    const playlist = await window.api.fileIpc.emitGetPlaylistAt({
+      folderPath,
+    })
+    console.log('获取到 playlist ===========>', playlist)
+    if (playlist === null) {
+      return
+    }
+    playlistStore.addPlaylist(playlist)
+  }, [])
 
   const gotoPlayerPage = (filePath: string) => {
     const searchParams = new URLSearchParams({
@@ -20,7 +37,10 @@ const PlaylistDetail: React.FunctionComponent<IProps> = (props) => {
     navigate(`/video/player?${searchParams}`)
   }
 
-  const files = currentPlaylist?.files ?? []
+  if (!folderPath) {
+    return null
+  }
+  const files = playlistStore.playlists[folderPath]?.files ?? []
 
   return (
     <div className="playlist-detail">

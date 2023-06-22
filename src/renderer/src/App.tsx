@@ -7,10 +7,9 @@ import router from './router'
 const App: FC<PropsWithChildren> = ({ children }) => {
   const playlistStore = usePlaylistStore()
   useAsyncEffect(async () => {
-    const { playlists: latestPlaylists } =
+    const { playlistLocations: latestPlaylistLocations } =
       await window.api.fileIpc.emitGetPlaylists()
-    console.log('latestPlaylists ===========>', latestPlaylists)
-    playlistStore.setPlaylists(latestPlaylists)
+    playlistStore.setPlaylistLocations(latestPlaylistLocations)
   }, [])
 
   return (

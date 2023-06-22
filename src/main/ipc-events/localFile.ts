@@ -37,11 +37,21 @@ const onSetWindowSize = async (
   return ipcMain.answerRenderer('set-window-size', callback)
 }
 
+const onGetPlaylistAt = async (
+  callback: (
+    data: FileIpc.GetPlaylistAtReq,
+    win?: BrowserWindow,
+  ) => Promise<FileIpc.GetPlaylistAtRes>,
+) => {
+  return ipcMain.answerRenderer('get-playlist-at', callback)
+}
+
 const localFileIpc = {
   onAddLocalFolder,
   onGetPlaylists,
   onRevealDbFile,
   onSetWindowSize,
+  onGetPlaylistAt,
 }
 
 export default localFileIpc

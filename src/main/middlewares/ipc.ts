@@ -38,7 +38,6 @@ const ipcMiddleware: AppMiddleware = {
       localFileIpc.onGetPlaylists(async () => {
         await appDataDb.read()
         const locations = appDataDb.data.playlistLocations ?? []
-        console.log('locations ==========>', locations)
         const playlistDetailCollectResults = locations.map((location) => {
           if (!location.folderPath) {
             return Promise.reject()
@@ -60,8 +59,19 @@ const ipcMiddleware: AppMiddleware = {
             ).value
           })
         return {
-          playlists,
+          playlistLocations: playlists,
         }
+      })
+
+      localFileIpc.onGetPlaylistAt(async (location) => {
+        console.log('main 接收到playlist, location ==========>', location)
+        if (!location.folderPath) {
+          return null
+        }
+        return fileUtils.getVideosStatsIn(
+          location.folderPath,
+          SUPPORTED_VIDEO_EXTENSIONS,
+        )
       })
 
       localFileIpc.onRevealDbFile(async () => {

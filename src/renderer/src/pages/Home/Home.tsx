@@ -15,7 +15,7 @@ const Home: React.FunctionComponent<IProps> = (props) => {
   }
 
   const folderPathSet = useMemo(() => {
-    return playlistStore.playlists.reduce<Set<string>>(
+    return playlistStore.playlistLocation.reduce<Set<string>>(
       (set, { folderPath }) => {
         if (folderPath) {
           set.add(folderPath)
@@ -24,12 +24,12 @@ const Home: React.FunctionComponent<IProps> = (props) => {
       },
       new Set(),
     )
-  }, [playlistStore.playlists])
+  }, [playlistStore.playlistLocation])
 
   return (
     <div className="home">
       <main className="playlists">
-        {playlistStore.playlists.map(({ folderName, folderPath, files }) => {
+        {playlistStore.playlistLocation.map(({ folderPath }) => {
           return (
             <article
               className="playlist"
@@ -40,7 +40,6 @@ const Home: React.FunctionComponent<IProps> = (props) => {
               }}
               key={folderPath}
             >
-              {/* <div className="folder-name">{folderName}</div> */}
               <div className="folder-path">{folderPath}</div>
             </article>
           )
@@ -54,7 +53,7 @@ const Home: React.FunctionComponent<IProps> = (props) => {
             addedPlaylists.folderPath &&
             !folderPathSet.has(addedPlaylists.folderPath)
           ) {
-            playlistStore.pushPlaylist(addedPlaylists)
+            playlistStore.pushPlaylistLocations(addedPlaylists)
           }
           console.log('res ===========>', addedPlaylists)
         }}
