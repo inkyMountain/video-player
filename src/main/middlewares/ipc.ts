@@ -44,7 +44,6 @@ const ipcMiddleware: AppMiddleware = {
       })
 
       localFileIpc.onGetPlaylistAt(async (location) => {
-        console.log('main 接收到playlist, location ==========>', location)
         if (!location.folderPath) {
           return null
         }
@@ -63,13 +62,11 @@ const ipcMiddleware: AppMiddleware = {
       })
 
       localFileIpc.onDeletePlaylistLocation(async ({ folderPath }) => {
-        console.log('folderPath ==========>', folderPath)
         await appDataDb.read()
         const playlistLocations = appDataDb.data.playlistLocations
         const index = playlistLocations.findIndex(
           (location) => location.folderPath === folderPath,
         )
-        console.log('index ==========>', index)
         if (index === -1) {
           return
         }
