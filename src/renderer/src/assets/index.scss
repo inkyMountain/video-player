@@ -141,4 +141,15 @@ button {
   border: gray 1px solid;
   border-radius: 4px;
   margin-right: 4px;
+  padding: 4px 10px;
+  &:hover {
+    @media (prefers-color-scheme: dark) {
+      background-color: rgb(40, 40, 40);
+    }
+    @media (prefers-color-scheme: light) {
+      background-color: gray;
+    }
+    transition: all ease 0.2s;
+    cursor: pointer;
+  }
 }

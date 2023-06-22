@@ -3,6 +3,7 @@ import React, { useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import './PlaylistDetail.scss'
 import { useAsyncEffect } from 'ahooks'
+import NavigationBar from '@renderer/components/NavigationBar/NavigationBar'
 
 interface IProps {}
 
@@ -23,7 +24,6 @@ const PlaylistDetail: React.FunctionComponent<IProps> = (props) => {
     const playlist = await window.api.fileIpc.emitGetPlaylistAt({
       folderPath,
     })
-    console.log('获取到 playlist ===========>', playlist)
     if (playlist === null) {
       return
     }
@@ -44,6 +44,7 @@ const PlaylistDetail: React.FunctionComponent<IProps> = (props) => {
 
   return (
     <div className="playlist-detail">
+      <NavigationBar />
       {/* 文件夹路径 */}
       <h1 className="folder-path">{pathParams.folderPath}</h1>
 

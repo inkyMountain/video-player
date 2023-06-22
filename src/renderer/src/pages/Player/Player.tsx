@@ -1,6 +1,5 @@
 import { FC, useEffect, useRef } from 'react'
 import './Player.scss'
-import videojs from 'video.js'
 import 'video.js/dist/video-js.min.css'
 import '@videojs/themes/dist/city/index.css'
 import '@videojs/themes/dist/sea/index.css'
@@ -8,13 +7,12 @@ import '@videojs/themes/dist/fantasy/index.css'
 import '@videojs/themes/dist/forest/index.css'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import classnames from 'classnames'
-import { useImmer } from 'use-immer'
 import Player from 'video.js/dist/types/player'
 import { useFullscreen } from 'ahooks'
+import NavigationBar from '@renderer/components/NavigationBar/NavigationBar'
 
 const VideoPlayer: FC<{}> = () => {
   const videoRef = useRef<HTMLVideoElement>(null)
-  const player = useRef<Player>()
   const navigate = useNavigate()
 
   const [isFullscreen, { enterFullscreen, exitFullscreen, toggleFullscreen }] =
@@ -56,6 +54,9 @@ const VideoPlayer: FC<{}> = () => {
 
   return (
     <div className="player">
+      <header className="navigation-bar-wrapper">
+        <NavigationBar />
+      </header>
       {filePath ? (
         <video
           onDoubleClick={() => {
@@ -85,15 +86,6 @@ const VideoPlayer: FC<{}> = () => {
       ) : (
         '无视频地址'
       )}
-
-      <button
-        className="close-button"
-        onClick={() => {
-          navigate(-1)
-        }}
-      >
-        关闭
-      </button>
     </div>
   )
 }

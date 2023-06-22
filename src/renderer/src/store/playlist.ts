@@ -2,7 +2,7 @@ import { create } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
 
 interface PlaylistStore {
-  playlistLocation: Array<Common.PlaylistLocation>
+  playlistLocations: Array<Common.PlaylistLocation>
   setPlaylistLocations: (playlists: Array<Common.PlaylistLocation>) => void
   pushPlaylistLocations: (playlist: Common.PlaylistLocation) => void
   clearPlaylistLocations: () => void
@@ -16,20 +16,20 @@ interface PlaylistStore {
 const usePlaylistStore = create(
   immer<PlaylistStore>((set, get) => {
     return {
-      playlistLocation: [],
+      playlistLocations: [],
       setPlaylistLocations(newPlaylists) {
         set((store) => {
-          store.playlistLocation = newPlaylists
+          store.playlistLocations = newPlaylists
         })
       },
       pushPlaylistLocations(newPlaylist) {
-        set(({ playlistLocation: playlists }) => {
+        set(({ playlistLocations: playlists }) => {
           playlists.push(newPlaylist)
         })
       },
       clearPlaylistLocations() {
         set((store) => {
-          store.playlistLocation = []
+          store.playlistLocations = []
         })
       },
 

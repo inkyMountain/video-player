@@ -8,14 +8,13 @@ interface IProps {}
 const Home: React.FunctionComponent<IProps> = (props) => {
   const navigate = useNavigate()
   const playlistStore = usePlaylistStore()
-  console.log('playlistStore ===========>', playlistStore)
 
   const gotoPlaylistDetailPage = (folderPath: string) => {
     navigate(`/playlist-detail/${encodeURIComponent(folderPath)}`)
   }
 
   const folderPathSet = useMemo(() => {
-    return playlistStore.playlistLocation.reduce<Set<string>>(
+    return playlistStore.playlistLocations.reduce<Set<string>>(
       (set, { folderPath }) => {
         if (folderPath) {
           set.add(folderPath)
@@ -24,12 +23,12 @@ const Home: React.FunctionComponent<IProps> = (props) => {
       },
       new Set(),
     )
-  }, [playlistStore.playlistLocation])
+  }, [playlistStore.playlistLocations])
 
   return (
     <div className="home">
       <main className="playlists">
-        {playlistStore.playlistLocation.map(({ folderPath }) => {
+        {playlistStore.playlistLocations.map(({ folderPath }) => {
           return (
             <article
               className="playlist"
