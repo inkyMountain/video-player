@@ -1,4 +1,4 @@
-import { FC, useEffect, useRef } from 'react'
+import { FC, useEffect, useRef, useState } from 'react'
 import './Player.scss'
 import 'video.js/dist/video-js.min.css'
 import '@videojs/themes/dist/city/index.css'
@@ -7,50 +7,105 @@ import '@videojs/themes/dist/fantasy/index.css'
 import '@videojs/themes/dist/forest/index.css'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import classnames from 'classnames'
-import Player from 'video.js/dist/types/player'
-import { useFullscreen, useMemoizedFn } from 'ahooks'
+import { useImmer } from 'use-immer'
+import {
+  useDebounceFn,
+  useFullscreen,
+  useMemoizedFn,
+  useThrottle,
+} from 'ahooks'
 import NavigationBar from '@renderer/components/NavigationBar/NavigationBar'
+import { Peer } from 'peerjs'
 
 const VideoPlayer: FC<{}> = () => {
-  const videoRef = useRef<HTMLVideoElement>(null)
+  const videoRef = useRef<
+    HTMLVideoElement & { captureStream: HTMLCanvasElement['captureStream'] }
+  >(null)
+  const wrapperRef = useRef<HTMLDivElement>(null!)
+
   const navigate = useNavigate()
-
   const [isFullscreen, { enterFullscreen, exitFullscreen, toggleFullscreen }] =
-    useFullscreen(videoRef.current, {})
+    useFullscreen(wrapperRef.current, {})
 
+  const [progress, setProgress] = useImmer({
+    duration: 0,
+    currentTime: 0,
+  })
+
+  const [controlsVisible, setControlsVisible] = useState(false)
+  const { run: hideControls } = useDebounceFn(
+    () => {
+      setControlsVisible(false)
+    },
+    { wait: 1000 },
+  )
+  useEffect(() => {
+    const onMouseMove = () => {
+      setControlsVisible(true)
+      hideControls()
+    }
+    const onMouseLeave = () => {
+      setControlsVisible(false)
+    }
+    document.addEventListener('mousemove', onMouseMove)
+    document.addEventListener('mouseleave', onMouseLeave)
+    return () => {
+      document.removeEventListener('mousemove', onMouseMove)
+      document.removeEventListener('mouseleave', onMouseLeave)
+    }
+  }, [])
+
+  // 等视频加载完成后，自动开始播放。
   useEffect(() => {
     const onCanplayThrough = () => {
       videoRef.current?.play()
+      const videoWidth = videoRef.current?.videoWidth
+      const videoHeight = videoRef.current?.videoHeight
+      // if (videoWidth && videoHeight) {
+      //   window.api.fileIpc.emitSetWindowSize({
+      //     width: videoWidth,
+      //     height: videoHeight,
+      //   })
+      // }
     }
-    videoRef.current?.addEventListener('canplaythrough', onCanplayThrough)
+    const onTimeUpdate = () => {
+      // if (videoRef.current?.currentTime && videoRef.current?.duration) {
+      //   updateProgress({})
+      // }
+      setProgress((p) => {
+        if (videoRef.current?.currentTime) {
+          p.currentTime = videoRef.current?.currentTime
+        }
+        if (videoRef.current?.duration) {
+          p.duration = videoRef.current?.duration
+        }
+      })
+    }
+    videoRef.current?.addEventListener('timeupdate', onTimeUpdate)
+    videoRef.current?.addEventListener('canplaythrough', onCanplayThrough, {
+      once: true,
+    })
     return () => {
       videoRef.current?.removeEventListener('canplaythrough', onCanplayThrough)
+      videoRef.current?.removeEventListener('progress', onTimeUpdate)
     }
-    // player.current = videojs(videoRef.current, {
-    //   controls: true,
-    //   // autoPlay: true,
-    // })
-    // const onPlay = () => {
-    //   const videoWidth = player.current?.videoWidth()
-    //   const videoHeight = player.current?.videoHeight()
-    //   if (videoWidth && videoHeight) {
-    //     window.api.fileIpc.emitSetWindowSize({
-    //       width: videoWidth,
-    //       height: videoHeight,
-    //     })
-    //   }
-    //   console.log(`videoWidth: ${videoWidth}`, `videoHeight: ${videoHeight}`)
-    // }
-    // videoRef.current.addEventListener('canplaythrough', onPlay)
-    // return () => {
-    //   videoRef.current.removeEventListener('canplaythrough', onPlay)
-    //   player.current?.dispose()
-    // }
   }, [])
 
   const [searchParams, _setSearchParams] = useSearchParams()
   const searchParamsMap = new Map(searchParams.entries())
   const filePath = searchParamsMap.get('filePath')
+
+  const peer = useRef<Peer>()
+  const peerId = useRef<string>()
+  if (!peer.current) {
+    peer.current = new Peer('player-b161dda5-5521-419f-8bb9-cfcff0934b41')
+    peer.current.once('open', (id) => {
+      peerId.current = id
+    })
+    peer.current.on('error', (error) => {
+      console.error('peerjs出错', error)
+    })
+  }
 
   const togglePlayState = useMemoizedFn(() => {
     if (videoRef.current?.paused) {
@@ -60,13 +115,45 @@ const VideoPlayer: FC<{}> = () => {
     }
   })
 
+  const [hoverIndicatorPercent, setHoverIndicatorPercent] = useState(0)
+  const [hoverIndicatorVisible, setHoverIndicatorVisible] = useState(false)
+
   return (
-    <div className="player">
-      <header className="navigation-bar-wrapper">
+    <div className="player" ref={wrapperRef}>
+      <header
+        className="navigation-bar-wrapper"
+        style={{
+          opacity: controlsVisible ? 1 : 0,
+          pointerEvents: controlsVisible ? 'all' : 'none',
+        }}
+      >
         <NavigationBar />
+        <button
+          onClick={() => {
+            console.log('点击共享')
+            const stream = videoRef.current?.captureStream()
+            console.log('获取 video stream ===========>', stream)
+            if (!stream) {
+              return
+            }
+            console.log('call', stream)
+            peer.current?.call(
+              'follower-b161dda5-5521-419f-8bb9-cfcff0934b41',
+              stream,
+            )
+            peer.current?.on('call', (remoteStream) => {
+              console.log('remoteStream ===========>', remoteStream)
+            })
+            // peer.call('b161dda5-5521-419f-8bb9-cfcff0934b41')
+          }}
+        >
+          开始共享
+        </button>
       </header>
+
       {filePath ? (
         <video
+          loop={false}
           onDoubleClick={() => {
             toggleFullscreen()
           }}
@@ -74,7 +161,7 @@ const VideoPlayer: FC<{}> = () => {
             togglePlayState()
           }}
           onClick={() => {
-            togglePlayState()
+            // togglePlayState()
           }}
           className={classnames(
             'video-js',
@@ -91,6 +178,95 @@ const VideoPlayer: FC<{}> = () => {
       ) : (
         '无视频地址'
       )}
+
+      <footer
+        className="control-bar"
+        style={{
+          opacity: controlsVisible ? 1 : 0,
+          pointerEvents: controlsVisible ? 'all' : 'none',
+        }}
+      >
+        <div className="first-row">
+          <div className="left-buttons"></div>
+          <div className="center-buttons">
+            <button>上一集</button>
+            <button
+              onClick={() => {
+                if (videoRef.current) {
+                  videoRef.current.currentTime -= 10
+                }
+              }}
+            >
+              快退10s
+            </button>
+            <button onClick={() => togglePlayState()}>
+              {videoRef.current?.paused ? '播放' : '暂停'}
+            </button>
+            <button
+              onClick={() => {
+                if (videoRef.current) {
+                  videoRef.current.currentTime += 10
+                }
+              }}
+            >
+              快进10s
+            </button>
+            <button>下一集</button>
+          </div>
+          <div className="right-buttons">
+            <button
+              onClick={() => {
+                toggleFullscreen()
+              }}
+            >
+              全屏
+            </button>
+          </div>
+        </div>
+
+        <div className="second-row">
+          <div
+            className="progress"
+            onMouseMove={(event) => {
+              setHoverIndicatorVisible(true)
+              const { left, width } =
+                event.currentTarget.getBoundingClientRect()
+              const newPercent = (event.clientX - left) / width
+              setHoverIndicatorPercent(newPercent)
+            }}
+            onMouseLeave={() => {
+              setHoverIndicatorVisible(false)
+            }}
+            onClick={(event) => {
+              setHoverIndicatorVisible(false)
+              const { width, left } =
+                event.currentTarget.getBoundingClientRect()
+              const percent = (event.clientX - left) / width
+              if (videoRef.current) {
+                videoRef.current.currentTime =
+                  videoRef.current.duration * percent
+              }
+            }}
+          >
+            <div
+              className="done"
+              style={{
+                transform: `translateX(${
+                  (progress.currentTime / progress.duration) * 100
+                }%)`,
+              }}
+            />
+            {hoverIndicatorVisible && (
+              <div
+                className="hover-indicator"
+                style={{
+                  transform: `translateX(${hoverIndicatorPercent * 100}%)`,
+                }}
+              />
+            )}
+          </div>
+        </div>
+      </footer>
     </div>
   )
 }
