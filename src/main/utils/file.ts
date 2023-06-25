@@ -91,6 +91,8 @@ const globVideosIn = async (folderPath: string, extensions: string[]) => {
   return globby([`**/*.{${extensions.join(',')}}`], {
     cwd: folderPath,
     absolute: true,
+  }).then((filePaths) => {
+    return filePaths.map((p) => path.join(p))
   })
 }
 
