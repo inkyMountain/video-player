@@ -69,5 +69,10 @@
     "react-dom": "^18.2.0",
     "typescript": "^4.9.5",
     "vite": "^4.2.1"
+  },
+  "pnpm": {
+    "patchedDependencies": {
+      "node-ffprobe@1.2.2": "patches/node-ffprobe@1.2.2.patch"
+    }
   }
 }

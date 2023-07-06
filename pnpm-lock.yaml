@@ -1,8 +1,13 @@
-lockfileVersion: '6.1'
+lockfileVersion: '6.0'
 
 settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
+
+patchedDependencies:
+  node-ffprobe@1.2.2:
+    hash: jc4q37zdufax6syjwnpxk32ini
+    path: patches/node-ffprobe@1.2.2.patch
 
 dependencies:
   '@electron-toolkit/preload':
@@ -1403,6 +1408,7 @@ packages:
 
   /base64-js@1.5.1:
     resolution: {integrity: sha512-AKpaYlHn8t4SVbOHCy+b5+KKgvR4vrsD8vbvrbiQJps7fKDTkjkDry6ji0rUJjC0kzbNePLwzxq8iypo41qeWA==}
+    requiresBuild: true
     dev: true
 
   /binary-extensions@2.2.0:
@@ -3482,10 +3488,11 @@ packages:
     dev: true
     optional: true
 
-  /node-ffprobe@1.2.2:
+  /node-ffprobe@1.2.2(patch_hash=jc4q37zdufax6syjwnpxk32ini):
     resolution: {integrity: sha512-SGYp8iyCIE3uw5rB8PsGA5iJS8YD+SX2vXcTIdYHGuD+eVJT4Di7FJ53HjqSiM1AiPpDzbUfG4G8yEc1GvTeJg==}
     engines: {node: '>= 0.6.0'}
     dev: false
+    patched: true
 
   /node-releases@2.0.10:
     resolution: {integrity: sha512-5GFldHPXVG/YZmFzJvKK2zDSzPKhEp0+ZR5SVaoSag9fsL5YgHbUHDfnG5494ISANDcK4KwPXAx2xqVEydmd7w==}
@@ -4000,7 +4007,7 @@ packages:
       concat-stream: 1.6.2
       is-video: 1.0.1
       meow: 3.7.0
-      node-ffprobe: 1.2.2
+      node-ffprobe: 1.2.2(patch_hash=jc4q37zdufax6syjwnpxk32ini)
       object-assign: 3.0.0
       through2: 2.0.5
     dev: false
@@ -4742,6 +4749,7 @@ packages:
   /xmlbuilder@15.1.1:
     resolution: {integrity: sha512-yMqGBqtXyeN1e3TGYvgNgDVZ3j84W4cwkOXQswghol6APgZWaff9lnbvN7MHYJOiXsvGPXtjTYJEiC9J2wv9Eg==}
     engines: {node: '>=8.0'}
+    requiresBuild: true
     dev: true
 
   /xtend@4.0.2:
