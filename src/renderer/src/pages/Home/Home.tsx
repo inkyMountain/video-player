@@ -44,6 +44,7 @@ const Home: React.FunctionComponent<IProps> = (props) => {
             >
               <div className="folder-path">
                 <div className="path-text">{folderPath}</div>
+                {/* 删除按钮。点击后，通过ipc通信，让主进程删除数据库文件中的这个文件夹路径。 */}
                 <button
                   className="delete-button"
                   onClick={async (event) => {
@@ -51,9 +52,12 @@ const Home: React.FunctionComponent<IProps> = (props) => {
                     if (!folderPath) {
                       return
                     }
+                    // 让主进程删除数据库文件中的这个文件夹路径
                     await window.api.fileIpc.emitDeletePlaylistLocation(
                       location,
                     )
+                    // 文件中的路径被删除后，再次获取删除完成后的所有播放列表。
+                    // 设置到全局 store 中。
                     const { playlistLocations: latestPlaylistLocations } =
                       await window.api.fileIpc.emitGetPlaylists()
                     playlistStore.setPlaylistLocations(latestPlaylistLocations)
@@ -69,11 +73,14 @@ const Home: React.FunctionComponent<IProps> = (props) => {
 
       <button
         onClick={async () => {
+          // 告诉主进程展示文件夹选择窗口，选择一个文件夹作为播放列表。
           const addedPlaylistLocation = await window.api.fileIpc.emitAddFolder()
+          // 如果文件夹路径有效
           if (
             addedPlaylistLocation !== null &&
             addedPlaylistLocation !== undefined
           ) {
+            // 就push到全局store中。
             playlistStore.pushPlaylistLocation(addedPlaylistLocation)
           }
         }}
