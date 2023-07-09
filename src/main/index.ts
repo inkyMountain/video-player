@@ -8,6 +8,9 @@ import mainWindowMiddleware from './middlewares/mainWindow'
 import { AppMiddleware } from './middlewares/types'
 import { createWindow } from './utils/window'
 
+const modulePath = app.getPath('module')
+console.log('modulePath ==========>', modulePath)
+
 const applyMiddleware = ({ apply, when }: AppMiddleware) => {
   if (is.dev && (when === 'dev' || when === 'all')) {
     apply()
@@ -19,7 +22,7 @@ const applyMiddleware = ({ apply, when }: AppMiddleware) => {
 applyMiddleware(ipcMiddleware)
 applyMiddleware(protocolMiddleware)
 applyMiddleware(mainWindowMiddleware)
-// applyMiddleware(devWindowMiddleware)
+applyMiddleware(devWindowMiddleware)
 
 if (is.dev) {
   electronDebug()

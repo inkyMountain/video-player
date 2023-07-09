@@ -1,6 +1,9 @@
-import React, { useEffect, useRef } from 'react'
+import React, { Fragment, useEffect, useRef, useState } from 'react'
 import { Peer } from 'peerjs'
 import NavigationBar from '@renderer/components/NavigationBar/NavigationBar'
+import { useMemoizedFn } from 'ahooks'
+import { error } from 'console'
+import { createEmptyMediaStream } from '@renderer/utils/peer'
 
 // const peer = new Peer()
 // peer.connect()
@@ -8,36 +11,62 @@ import NavigationBar from '@renderer/components/NavigationBar/NavigationBar'
 interface IProps {}
 
 const Follower: React.FunctionComponent<IProps> = (props) => {
-  const videoRef = useRef<HTMLVideoElement>(null!)
+  const videoRef = useRef<
+    HTMLVideoElement & { captureStream: HTMLCanvasElement['captureStream'] }
+  >(null!)
   const peer = useRef<Peer>(null!)
-  const peerId = useRef<string>()
+  // const peerId = useRef<string>()
+  const [localPeerId, setLocalPeerId] = useState<string>()
   if (!peer.current) {
-    // peer.current = new Peer()
-    peer.current = new Peer('follower-b161dda5-5521-419f-8bb9-cfcff0934b41')
+    peer.current = new Peer()
+    // peer.current = new Peer('follower-b161dda5-5521-419f-8bb9-cfcff0934b41')
     peer.current.once('open', (id) => {
-      peerId.current = id
+      setLocalPeerId(id)
     })
     peer.current.on('error', (error) => {
       console.error('peerjs出错', error)
     })
   }
 
-  useEffect(() => {
-    peer.current.on('call', (connection) => {
-      console.log('on call')
-      connection.answer()
-      connection.on('stream', (remoteStream) => {
-        console.log('on stream', remoteStream)
-        videoRef.current.srcObject = remoteStream
-        videoRef.current.play()
-      })
+  const [peerIdInputValue, setPeerIdInputValue] = useState('')
+  const onEnterPeer = useMemoizedFn(() => {
+    console.log('点击共享')
+    const call = peer.current?.call(peerIdInputValue, createEmptyMediaStream())
+    call.on('stream', (s) => {
+      console.log('remoteStream ===========>', s)
+      videoRef.current.srcObject = s
     })
-  }, [])
+    call.on('error', (error) => {
+      console.log('error ===========>', error)
+    })
+    call.on('close', () => {
+      console.log('close')
+    })
+  })
 
   return (
     <div className="follower">
       <NavigationBar />
-      <video ref={videoRef}></video>
+      <Fragment>
+        <label>
+          请输入对方的分享id：
+          <input
+            onKeyDown={(event) => {
+              const isEnter = event.key.toLowerCase() === 'enter'
+              if (!isEnter) {
+                return
+              }
+              onEnterPeer()
+            }}
+            value={peerIdInputValue}
+            onChange={(event) => {
+              setPeerIdInputValue(event.currentTarget.value)
+            }}
+          />
+        </label>
+        <button onClick={onEnterPeer}>加入</button>
+      </Fragment>
+      <video ref={videoRef} autoPlay></video>
     </div>
   )
 }

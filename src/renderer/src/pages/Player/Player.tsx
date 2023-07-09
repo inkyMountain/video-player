@@ -8,20 +8,26 @@ import '@videojs/themes/dist/forest/index.css'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import classnames from 'classnames'
 import { useImmer } from 'use-immer'
-import {
-  useDebounceFn,
-  useFullscreen,
-  useMemoizedFn,
-  useThrottle,
-} from 'ahooks'
+import { useDebounceFn, useFullscreen, useMemoizedFn } from 'ahooks'
+import { CopyToClipboard } from 'react-copy-to-clipboard'
 import NavigationBar from '@renderer/components/NavigationBar/NavigationBar'
-import { Peer } from 'peerjs'
+import { MediaConnection, Peer } from 'peerjs'
+import Modal from 'react-modal'
+import usePeerStore from '@renderer/store/peerStore'
+Modal.setAppElement('#root')
 
 const VideoPlayer: FC<{}> = () => {
   const videoRef = useRef<
     HTMLVideoElement & { captureStream: HTMLCanvasElement['captureStream'] }
   >(null)
   const wrapperRef = useRef<HTMLDivElement>(null!)
+  const peerStore = usePeerStore()
+  // useEffect(() => {
+  //   return () => {
+  //     peerStore.peer.off('open', onOpen)
+  //     peerStore.peer.off('disconnected', onDisconnected)
+  //   }
+  // }, [])
 
   const navigate = useNavigate()
   const [isFullscreen, { enterFullscreen, exitFullscreen, toggleFullscreen }] =
@@ -95,17 +101,19 @@ const VideoPlayer: FC<{}> = () => {
   const searchParamsMap = new Map(searchParams.entries())
   const filePath = searchParamsMap.get('filePath')
 
-  const peer = useRef<Peer>()
-  const peerId = useRef<string>()
-  if (!peer.current) {
-    peer.current = new Peer('player-b161dda5-5521-419f-8bb9-cfcff0934b41')
-    peer.current.once('open', (id) => {
-      peerId.current = id
-    })
-    peer.current.on('error', (error) => {
-      console.error('peerjs出错', error)
-    })
-  }
+  // const peer = useRef<Peer>()
+  // const peerId = useRef<string>()
+  // const [localPeerId, setLocalPeerId] = useState<string>()
+  // if (!peer.current) {
+  //   peer.current = new Peer()
+  //   peer.current.once('open', (id) => {
+  //     console.log('id ===========>', id)
+  //     setLocalPeerId(id)
+  //   })
+  //   peer.current.on('error', (error) => {
+  //     console.error('peerjs出错', error)
+  //   })
+  // }
 
   const togglePlayState = useMemoizedFn(() => {
     if (videoRef.current?.paused) {
@@ -118,41 +126,29 @@ const VideoPlayer: FC<{}> = () => {
   const [hoverIndicatorPercent, setHoverIndicatorPercent] = useState(0)
   const [hoverIndicatorVisible, setHoverIndicatorVisible] = useState(false)
 
+  const [shareModalVisible, setShareModalVisible] = useState(false)
+
+  useEffect(() => {
+    const listener = (call: MediaConnection) => {
+      const stream = videoRef.current?.captureStream()
+      // const track = document.createElement('track')
+      // track.track
+      if (stream) {
+        call.answer(stream)
+        console.log('call answer')
+      }
+    }
+    peerStore.getPeer().on('call', listener)
+    return () => {
+      peerStore.getPeer().off('call', listener)
+    }
+  }, [])
+
   return (
     <div className="player" ref={wrapperRef}>
-      <header
-        className="navigation-bar-wrapper"
-        style={{
-          opacity: controlsVisible ? 1 : 0,
-          pointerEvents: controlsVisible ? 'all' : 'none',
-        }}
-      >
-        <NavigationBar />
-        <button
-          onClick={() => {
-            console.log('点击共享')
-            const stream = videoRef.current?.captureStream()
-            console.log('获取 video stream ===========>', stream)
-            if (!stream) {
-              return
-            }
-            console.log('call', stream)
-            peer.current?.call(
-              'follower-b161dda5-5521-419f-8bb9-cfcff0934b41',
-              stream,
-            )
-            peer.current?.on('call', (remoteStream) => {
-              console.log('remoteStream ===========>', remoteStream)
-            })
-            // peer.call('b161dda5-5521-419f-8bb9-cfcff0934b41')
-          }}
-        >
-          开始共享
-        </button>
-      </header>
-
       {filePath ? (
         <video
+          autoPlay
           loop={false}
           onDoubleClick={() => {
             toggleFullscreen()
@@ -179,94 +175,167 @@ const VideoPlayer: FC<{}> = () => {
         '无视频地址'
       )}
 
-      <footer
-        className="control-bar"
-        style={{
-          opacity: controlsVisible ? 1 : 0,
-          pointerEvents: controlsVisible ? 'all' : 'none',
-        }}
-      >
-        <div className="first-row">
-          <div className="left-buttons"></div>
-          <div className="center-buttons">
-            <button>上一集</button>
-            <button
-              onClick={() => {
-                if (videoRef.current) {
-                  videoRef.current.currentTime -= 10
-                }
-              }}
-            >
-              快退10s
-            </button>
-            <button onClick={() => togglePlayState()}>
-              {videoRef.current?.paused ? '播放' : '暂停'}
-            </button>
-            <button
-              onClick={() => {
-                if (videoRef.current) {
-                  videoRef.current.currentTime += 10
-                }
-              }}
-            >
-              快进10s
-            </button>
-            <button>下一集</button>
-          </div>
-          <div className="right-buttons">
-            <button
-              onClick={() => {
-                toggleFullscreen()
-              }}
-            >
-              全屏
-            </button>
-          </div>
-        </div>
-
-        <div className="second-row">
-          <div
-            className="progress"
-            onMouseMove={(event) => {
-              setHoverIndicatorVisible(true)
-              const { left, width } =
-                event.currentTarget.getBoundingClientRect()
-              const newPercent = (event.clientX - left) / width
-              setHoverIndicatorPercent(newPercent)
-            }}
-            onMouseLeave={() => {
-              setHoverIndicatorVisible(false)
-            }}
-            onClick={(event) => {
-              setHoverIndicatorVisible(false)
-              const { width, left } =
-                event.currentTarget.getBoundingClientRect()
-              const percent = (event.clientX - left) / width
-              if (videoRef.current) {
-                videoRef.current.currentTime =
-                  videoRef.current.duration * percent
+      <div className="control-layer">
+        <header
+          className="navigation-bar-wrapper"
+          style={{
+            opacity: controlsVisible ? 1 : 0,
+            pointerEvents: controlsVisible ? 'all' : 'none',
+          }}
+        >
+          <NavigationBar />
+          {/* <button
+            onClick={() => {
+              console.log('点击共享')
+              const stream = videoRef.current?.captureStream()
+              console.log('获取 video stream ===========>', stream)
+              if (!stream) {
+                return
               }
+              console.log('call', stream)
+              peer.current?.call(
+                'follower-b161dda5-5521-419f-8bb9-cfcff0934b41',
+                stream,
+              )
+              peer.current?.on('call', (remoteStream) => {
+                console.log('remoteStream ===========>', remoteStream)
+              })
+              // peer.call('b161dda5-5521-419f-8bb9-cfcff0934b41')
             }}
           >
+            开始共享
+          </button> */}
+        </header>
+
+        <footer
+          className="control-bar"
+          style={{
+            opacity: controlsVisible ? 1 : 0,
+            pointerEvents: controlsVisible ? 'all' : 'none',
+          }}
+        >
+          <div className="first-row">
+            <div className="left-buttons">
+              <button
+                onClick={() => {
+                  setShareModalVisible(true)
+                }}
+              >
+                分享画面
+              </button>
+            </div>
+            <div className="center-buttons">
+              <button>上一集</button>
+              <button
+                onClick={() => {
+                  if (videoRef.current) {
+                    videoRef.current.currentTime -= 10
+                  }
+                }}
+              >
+                快退10s
+              </button>
+              <button onClick={() => togglePlayState()}>
+                {videoRef.current?.paused ? '播放' : '暂停'}
+              </button>
+              <button
+                onClick={() => {
+                  if (videoRef.current) {
+                    videoRef.current.currentTime += 10
+                  }
+                }}
+              >
+                快进10s
+              </button>
+              <button>下一集</button>
+            </div>
+            <div className="right-buttons">
+              <button
+                onClick={() => {
+                  toggleFullscreen()
+                }}
+              >
+                全屏
+              </button>
+            </div>
+          </div>
+
+          <div className="second-row">
             <div
-              className="done"
-              style={{
-                transform: `translateX(${
-                  (progress.currentTime / progress.duration) * 100
-                }%)`,
+              className="progress"
+              onMouseMove={(event) => {
+                setHoverIndicatorVisible(true)
+                const { left, width } =
+                  event.currentTarget.getBoundingClientRect()
+                const newPercent = (event.clientX - left) / width
+                setHoverIndicatorPercent(newPercent)
               }}
-            />
-            {hoverIndicatorVisible && (
+              onMouseLeave={() => {
+                setHoverIndicatorVisible(false)
+              }}
+              onClick={(event) => {
+                setHoverIndicatorVisible(false)
+                const { width, left } =
+                  event.currentTarget.getBoundingClientRect()
+                const percent = (event.clientX - left) / width
+                if (videoRef.current) {
+                  const currentTime = videoRef.current.duration * percent
+                  videoRef.current.currentTime = currentTime
+                  setProgress((p) => {
+                    p.currentTime = currentTime
+                  })
+                }
+              }}
+            >
               <div
-                className="hover-indicator"
+                className="done"
                 style={{
-                  transform: `translateX(${hoverIndicatorPercent * 100}%)`,
+                  transform: `translateX(${
+                    (progress.currentTime / progress.duration) * 100
+                  }%)`,
                 }}
               />
-            )}
+              {hoverIndicatorVisible && (
+                <div
+                  className="hover-indicator"
+                  style={{
+                    transform: `translateX(${hoverIndicatorPercent * 100}%)`,
+                  }}
+                />
+              )}
+            </div>
           </div>
-        </div>
-      </footer>
+        </footer>
+      </div>
+
+      <Modal
+        isOpen={shareModalVisible}
+        shouldCloseOnEsc={true}
+        style={{
+          content: {
+            backgroundColor: 'whitesmoke',
+          },
+        }}
+      >
+        <CopyToClipboard
+          text={peerStore.localPeerId}
+          onCopy={() => {
+            setShareModalVisible(false)
+          }}
+        >
+          <div>
+            <span>{peerStore.localPeerId}</span>
+            <button>复制分享id</button>
+          </div>
+        </CopyToClipboard>
+        <button
+          onClick={() => {
+            setShareModalVisible(false)
+          }}
+        >
+          关闭弹窗
+        </button>
+      </Modal>
     </div>
   )
 }

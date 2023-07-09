@@ -19,6 +19,7 @@ const mainWindowMiddleware: AppMiddleware = {
       const { loadPromise, win } = createWindow()
       await loadPromise
       const file = pendingFiles.shift()
+
       if (file) {
         videoIpc.emitOpenFile(win, {
           url: file?.url,
