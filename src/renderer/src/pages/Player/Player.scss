@@ -42,22 +42,35 @@
           background-color: rgba(176, 196, 222, 0.3);
           position: relative;
           height: 50px;
-        }
-        .done {
-          position: absolute;
-          top: 0;
-          right: 100%;
-          width: 100%;
-          height: 100%;
-          background-color: rgba(176, 196, 222, 0.6);
-        }
-        .hover-indicator {
-          position: absolute;
-          top: 0;
-          right: 100%;
-          border-right: 2px solid rgb(175, 205, 242);
-          height: 100%;
-          width: 100%;
+          .done {
+            position: absolute;
+            top: 0;
+            right: 100%;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(176, 196, 222, 0.6);
+          }
+          .hover-indicator {
+            position: absolute;
+            top: 0;
+            right: 100%;
+            border-right: 2px solid rgb(175, 205, 242);
+            height: 100%;
+            width: 100%;
+          }
+
+          .current-time {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+          }
+          .total-time {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+          }
         }
       }
     }

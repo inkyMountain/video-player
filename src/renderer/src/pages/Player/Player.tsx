@@ -303,6 +303,10 @@ const VideoPlayer: FC<{}> = () => {
                   }}
                 />
               )}
+              <div className="current-time">
+                {progress.currentTime.toFixed(0)}
+              </div>
+              <div className="total-time">{progress.duration.toFixed(0)}</div>
             </div>
           </div>
         </footer>

@@ -1,4 +1,4 @@
-import Peer from 'peerjs'
+import Peer, { PeerErrorType } from 'peerjs'
 import { create } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
 
@@ -26,12 +26,20 @@ const peer = new Peer()
 const store = usePeerStore.getState()
 const onOpen = (id: string) => {
   store.setLocalPeerId(id)
-  console.log('connection open ==========>', id)
+  console.log('信令服务器连接建立成功', id)
 }
 const onDisconnected = () => {
   peer.reconnect()
 }
+const onError = (error: Error) => {
+  const errorWithType = error as PeerJSError
+  // errorWithType.type === PeerErrorType.WebRTC
+  console.log('peerjs 错误', error)
+}
 peer.on('open', onOpen)
 peer.on('disconnected', onDisconnected)
+peer.on('error', onError)
+
+type PeerJSError = Error & { type: PeerErrorType }
 
 export default usePeerStore
