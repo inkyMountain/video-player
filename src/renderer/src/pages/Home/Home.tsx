@@ -14,18 +14,6 @@ const Home: React.FunctionComponent<IProps> = (props) => {
     navigate(`/playlist-detail/${encodeURIComponent(folderPath)}`)
   }
 
-  const folderPathSet = useMemo(() => {
-    return playlistStore.playlistLocations.reduce<Set<string>>(
-      (set, { folderPath }) => {
-        if (folderPath) {
-          set.add(folderPath)
-        }
-        return set
-      },
-      new Set(),
-    )
-  }, [playlistStore.playlistLocations])
-
   return (
     <div className="home">
       <NavigationBar backButtonVisible={false} />
