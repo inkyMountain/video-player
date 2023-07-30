@@ -1,4 +1,4 @@
-import { app, net, protocol, shell } from 'electron'
+import { app, protocol, shell } from 'electron'
 import { AppMiddleware } from './types'
 import fileUtils from '@main/utils/file'
 import path from 'path'
@@ -9,7 +9,8 @@ fsExtra
   .pathExists(thumbnailOutputDir)
   .then((isExist) => {
     if (!isExist) {
-      return fsExtra.ensureDir(thumbnailOutputDir)
+      fsExtra.ensureDir(thumbnailOutputDir)
+      return
     }
   })
   .finally(() => {
@@ -32,11 +33,10 @@ const protocolMiddleware: AppMiddleware = {
       //   })
       // })
       protocol.registerFileProtocol('local-file', (request, callback) => {
-        console.log('request.url ==========>', request.url)
+        console.log('request ==========>', request)
         const requestedFilePath = decodeURIComponent(
           request.url.replace(/^local-file:(\/\/)?/, ''),
         )
-        console.log('requestedFilePath ==========>', requestedFilePath)
         callback({
           path: requestedFilePath,
         })

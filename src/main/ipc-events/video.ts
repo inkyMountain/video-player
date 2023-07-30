@@ -8,8 +8,18 @@ const emitOpenFile = async (
   return ipcMain.callRenderer(win, 'open-video', data)
 }
 
+const onSubtitleGenerate = async (
+  callback: (
+    data: VideoIpc.SubtitleGenerateReq,
+    win: BrowserWindow,
+  ) => Promise<VideoIpc.SubtitleGenerateRes>,
+) => {
+  return ipcMain.answerRenderer('subtitle-generate', callback)
+}
+
 const videoIpc = {
   emitOpenFile,
+  onSubtitleGenerate,
 }
 
 export default videoIpc

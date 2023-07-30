@@ -4,7 +4,7 @@ import App from './App'
 import { RouterProvider } from 'react-router-dom'
 import router from './router'
 
-window.api.videoIpc.listenOpenFile(({ url }) => {
+window.api.videoIpc.onOpenFile(({ url }) => {
   const searchParams = new URLSearchParams({
     filePath: encodeURIComponent(url),
   })

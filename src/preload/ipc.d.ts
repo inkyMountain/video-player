@@ -1,11 +1,20 @@
 declare namespace SystemInfoIpc {
   export type PlatformRes = NodeJS.Platform
 }
+
 declare namespace VideoIpc {
   export interface OpenVideoReq {
     url: string
   }
   export type OpenVideoRes = {} | void
+
+  export interface SubtitleGenerateReq {
+    videoFilePath: string
+    subtitleLength: number
+  }
+  export interface SubtitleGenerateRes {
+    subtitleFilePaths: string[]
+  }
 }
 
 declare namespace FileIpc {

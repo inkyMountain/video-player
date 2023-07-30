@@ -1,20 +1,26 @@
 import { FC, useEffect, useRef, useState } from 'react'
 import './Player.scss'
-import 'video.js/dist/video-js.min.css'
-import '@videojs/themes/dist/city/index.css'
-import '@videojs/themes/dist/sea/index.css'
-import '@videojs/themes/dist/fantasy/index.css'
-import '@videojs/themes/dist/forest/index.css'
+// import 'video.js/dist/video-js.min.css'
+// import '@videojs/themes/dist/city/index.css'
+// import '@videojs/themes/dist/sea/index.css'
+// import '@videojs/themes/dist/fantasy/index.css'
+// import '@videojs/themes/dist/forest/index.css'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import classnames from 'classnames'
 import { useImmer } from 'use-immer'
-import { useDebounceFn, useFullscreen, useMemoizedFn } from 'ahooks'
+import {
+  useAsyncEffect,
+  useDebounceFn,
+  useFullscreen,
+  useMemoizedFn,
+} from 'ahooks'
 import { CopyToClipboard } from 'react-copy-to-clipboard'
 import NavigationBar from '@renderer/components/NavigationBar/NavigationBar'
 import { MediaConnection, Peer } from 'peerjs'
 import Modal from 'react-modal'
 import usePeerStore from '@renderer/store/peerStore'
 import { Left } from '@icon-park/react'
+import usePlaylistStore from '@renderer/store/playlist'
 
 const VideoPlayer: FC<{}> = () => {
   const videoRef = useRef<
@@ -22,6 +28,7 @@ const VideoPlayer: FC<{}> = () => {
   >(null)
   const wrapperRef = useRef<HTMLDivElement>(null!)
   const peerStore = usePeerStore()
+  const playlistStore = usePlaylistStore()
   // useEffect(() => {
   //   return () => {
   //     peerStore.peer.off('open', onOpen)
@@ -62,12 +69,12 @@ const VideoPlayer: FC<{}> = () => {
     }
   }, [])
 
-  // 等视频加载完成后，自动开始播放。
   useEffect(() => {
     const onCanplayThrough = () => {
+      // 等视频加载完成后，自动开始播放。
       videoRef.current?.play()
-      const videoWidth = videoRef.current?.videoWidth
-      const videoHeight = videoRef.current?.videoHeight
+      // const videoWidth = videoRef.current?.videoWidth
+      // const videoHeight = videoRef.current?.videoHeight
       // if (videoWidth && videoHeight) {
       //   window.api.fileIpc.emitSetWindowSize({
       //     width: videoWidth,
@@ -98,9 +105,8 @@ const VideoPlayer: FC<{}> = () => {
     }
   }, [])
 
-  const [searchParams, _setSearchParams] = useSearchParams()
-  const searchParamsMap = new Map(searchParams.entries())
-  const filePath = searchParamsMap.get('filePath')
+  const [params, _setSearchParams] = useSearchParams()
+  const { filePath, folderPath } = Object.fromEntries(params)
 
   // const peer = useRef<Peer>()
   // const peerId = useRef<string>()
@@ -149,6 +155,25 @@ const VideoPlayer: FC<{}> = () => {
     document.title = '分享者'
   }, [])
 
+  const [subtitleFilePaths, setSubtitleFilePaths] = useImmer<Array<string>>([])
+  const playlist = playlistStore.playlists[folderPath]
+  const currentFile = playlist?.files.find(({ path }) => path === filePath)
+
+  useAsyncEffect(async () => {
+    if (!currentFile) {
+      return
+    }
+    const subtitleLength = currentFile?.subtitles.length
+    if (subtitleLength !== undefined) {
+      const paths = await window.api.videoIpc.emitSubtitleGenerate({
+        subtitleLength,
+        videoFilePath: filePath,
+      })
+      console.log('paths ===========>', paths.subtitleFilePaths)
+      setSubtitleFilePaths(paths.subtitleFilePaths)
+    }
+  }, [])
+
   return (
     <div className="player" ref={wrapperRef}>
       {filePath ? (
@@ -164,17 +189,31 @@ const VideoPlayer: FC<{}> = () => {
           onClick={() => {
             // togglePlayState()
           }}
-          className={classnames(
-            'video-js',
-            'vjs-theme-sea',
+          className={
+            classnames()
+            // 'video-js',
+            // 'vjs-theme-sea',
             // 'vjs-theme-city',
             // 'vjs-theme-fantasy',
             // 'vjs-theme-forest',
-          )}
+          }
           ref={videoRef}
         >
           <source src={`local-file://${filePath}`} />
           {/* <source src={`http://localhost:5173/h264.mp4`} /> */}
+          {subtitleFilePaths.map((subtitlePath, index) => {
+            return (
+              <track
+                key={subtitlePath}
+                default={index === 0}
+                label="Deutsch"
+                kind="subtitles"
+                // srclang="de"
+                // src={`local-file://${encodeURIComponent(subtitlePath)}`}
+                src={`local-file://${subtitlePath}`}
+              />
+            )
+          })}
         </video>
       ) : (
         '无视频地址'

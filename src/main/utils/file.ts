@@ -118,10 +118,49 @@ const generateThumbnail = async (params: {
   })
 }
 
+const generateSubtitle = async (params: {
+  filePath: string
+  subtitleLength: number
+  outDir: string
+}) => {
+  const { filePath, subtitleLength, outDir } = params
+  const promises: Array<Promise<string>> = []
+  for (let i = 0; i < subtitleLength; i++) {
+    const promise = new Promise<string>((resolve, reject) => {
+      const parsedFilePath = path.parse(filePath)
+      const outputPath = path.join(outDir, `${parsedFilePath.name}_${i}.vtt`)
+      ffmpeg(filePath)
+        .outputOption([`-map 0:s:${i}`])
+        .output(outputPath)
+        .once('error', (error) => {
+          console.log('error ==========>', error)
+          reject(error)
+        })
+        .once('end', () => {
+          resolve(outputPath)
+        })
+        .run()
+    })
+    promises.push(promise)
+  }
+  // Promise.allSettled的作用是，等待所有 Promise resolve 或者 reject
+  return Promise.allSettled(promises)
+    .then((settledPromises) => {
+      // 筛选出所有成功的结果
+      return settledPromises.filter(({ status }) => status === 'fulfilled')
+    })
+    .then((result) => {
+      // 在使用 filter 之后，只剩下成功的结果了。但是ts还不知道，所以需要 as 来断言成成功结果。
+      const fulfilledResult = result as Array<PromiseFulfilledResult<string>>
+      return fulfilledResult.map(({ value }) => value)
+    })
+}
+
 const fileUtils = {
   getVideosStatsIn,
   globVideosIn,
   generateThumbnail,
+  generateSubtitle,
 }
 
 export default fileUtils

@@ -5,6 +5,10 @@ import appDataDb, { appConfigDbPath } from '@main/utils/lowdb'
 import fileUtils from '@main/utils/file'
 import { SUPPORTED_VIDEO_EXTENSIONS } from '@main/consts'
 import systemInfoIpc from '@main/ipc-events/systemInfo'
+import videoIpc from '@main/ipc-events/video'
+import path from 'path'
+
+const tempDir = path.join(app.getPath('temp'), app.name)
 
 const ipcMiddleware: AppMiddleware = {
   when: 'all',
@@ -78,6 +82,18 @@ const ipcMiddleware: AppMiddleware = {
 
     systemInfoIpc.onPlatform((_data, _win) => {
       return process.platform
+    })
+
+    videoIpc.onSubtitleGenerate(async (data, _win) => {
+      const { videoFilePath, subtitleLength } = data
+      const subtitleFilePaths = await fileUtils.generateSubtitle({
+        filePath: videoFilePath,
+        outDir: tempDir,
+        subtitleLength,
+      })
+      return {
+        subtitleFilePaths,
+      }
     })
   },
 }

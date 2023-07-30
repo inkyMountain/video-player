@@ -33,8 +33,9 @@ const PlaylistDetail: React.FunctionComponent<IProps> = (props) => {
   const gotoPlayerPage = (filePath: string) => {
     const searchParams = new URLSearchParams({
       filePath,
+      folderPath: folderPath ?? '',
     })
-    navigate(`/video/player?${searchParams}`)
+    navigate(`/video/player?${searchParams.toString()}`)
   }
 
   if (!folderPath) {
