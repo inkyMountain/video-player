@@ -4,6 +4,7 @@ import { app, dialog, shell } from 'electron'
 import appDataDb, { appConfigDbPath } from '@main/utils/lowdb'
 import fileUtils from '@main/utils/file'
 import { SUPPORTED_VIDEO_EXTENSIONS } from '@main/consts'
+import systemInfoIpc from '@main/ipc-events/systemInfo'
 
 const ipcMiddleware: AppMiddleware = {
   when: 'all',
@@ -73,6 +74,10 @@ const ipcMiddleware: AppMiddleware = {
         playlistLocations.splice(index, 1)
         await appDataDb.write()
       })
+    })
+
+    systemInfoIpc.onPlatform((_data, _win) => {
+      return process.platform
     })
   },
 }

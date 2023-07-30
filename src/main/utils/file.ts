@@ -96,9 +96,32 @@ const globVideosIn = async (folderPath: string, extensions: string[]) => {
   })
 }
 
+const generateThumbnail = async (params: {
+  filePath: string
+  filename: string
+  outputDir: string
+  timestamps: string[]
+}) => {
+  const { filePath, timestamps, outputDir, filename } = params
+  return new Promise<void>((resolve, reject) => {
+    ffmpeg(filePath)
+      .thumbnail({
+        filename,
+        count: timestamps.length,
+        timestamps,
+        folder: outputDir,
+      })
+      .once('error', (error) => reject(error))
+      .once('end', () => {
+        resolve()
+      })
+  })
+}
+
 const fileUtils = {
   getVideosStatsIn,
   globVideosIn,
+  generateThumbnail,
 }
 
 export default fileUtils

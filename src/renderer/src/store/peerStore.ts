@@ -12,6 +12,9 @@ const usePeerStore = create(
   immer<PeerStore>((set, get) => {
     return {
       getPeer: () => peer,
+      // getPeer: () => {
+      //   return {}
+      // },
       localPeerId: '',
       setLocalPeerId(id) {
         set((store) => {

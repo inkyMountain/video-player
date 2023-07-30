@@ -7,7 +7,8 @@ const devWindowMiddleware: AppMiddleware = {
   when: 'dev',
   apply() {
     const devUrl = new URL(DEFAULT_DEV_URL)
-    devUrl.hash = '/video/follower'
+    // devUrl.hash = '/video/follower'
+    devUrl.hash = '/'
     app.whenReady().then(() => {
       createWindow({
         devUrl: devUrl.toString(),

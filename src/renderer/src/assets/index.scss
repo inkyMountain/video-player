@@ -134,6 +134,7 @@ a:hover {
 }
 
 button {
+  display: inline-flex;
   background-color: transparent;
   appearance: none;
   outline: none;
@@ -152,5 +153,16 @@ button {
     }
     transition: all ease 0.2s;
     cursor: pointer;
+  }
+}
+
+input {
+  background-color: transparent;
+  display: inline-flex;
+  border-radius: 4px;
+  padding: 10px;
+  border: #3a3a3a 1px solid;
+  @media (prefers-color-scheme: dark) {
+    border: rgb(182, 182, 182) 1px solid;
   }
 }

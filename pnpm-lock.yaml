@@ -96,6 +96,9 @@ devDependencies:
   '@electron/notarize':
     specifier: ^1.2.3
     version: 1.2.3
+  '@icon-park/react':
+    specifier: ^1.4.2
+    version: 1.4.2(react-dom@18.2.0)(react@18.2.0)
   '@types/node':
     specifier: 16.18.21
     version: 16.18.21
@@ -156,6 +159,9 @@ devDependencies:
   react-dom:
     specifier: ^18.2.0
     version: 18.2.0(react@18.2.0)
+  react-meta-tags:
+    specifier: ^1.0.1
+    version: 1.0.1(react-dom@18.2.0)(react@18.2.0)
   react-modal:
     specifier: ^3.16.1
     version: 3.16.1(react-dom@18.2.0)(react@18.2.0)
@@ -744,6 +750,17 @@ packages:
 
   /@humanwhocodes/object-schema@1.2.1:
     resolution: {integrity: sha512-ZnQMnLV4e7hDlUvw8H+U8ASL02SS2Gn6+9Ac3wGGLIe7+je2AeAOxPY+izIPJDfFDb7eDjev0Us8MO1iFRN8hA==}
+    dev: true
+
+  /@icon-park/react@1.4.2(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-+MtQLjNiRuia3fC/NfpSCTIy5KH5b+NkMB9zYd7p3R4aAIK61AjK0OSraaICJdkKooU9jpzk8m0fY4g9A3JqhQ==}
+    engines: {node: '>= 8.0.0', npm: '>= 5.0.0'}
+    peerDependencies:
+      react: '>=16.9'
+      react-dom: '>=16.9'
+    dependencies:
+      react: 18.2.0
+      react-dom: 18.2.0(react@18.2.0)
     dev: true
 
   /@jridgewell/gen-mapping@0.3.3:
@@ -3881,6 +3898,16 @@ packages:
 
   /react-lifecycles-compat@3.0.4:
     resolution: {integrity: sha512-fBASbA6LnOU9dOU2eW7aQ8xmYBSXUIWr+UmF9b1efZBazGNO+rcXT/icdKnYm2pTwcRylVUYwW7H1PHfLekVzA==}
+    dev: true
+
+  /react-meta-tags@1.0.1(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-uylBI9UOI0QCGDsl6PlZaHnp+MxEpwslTlicPjnlcD68I8Kl2hdbuAZBRih+yU5StArSMB6T0jBrgst6rAuDYQ==}
+    peerDependencies:
+      react: ^16.6.0
+      react-dom: ^16.6.0
+    dependencies:
+      react: 18.2.0
+      react-dom: 18.2.0(react@18.2.0)
     dev: true
 
   /react-modal@3.16.1(react-dom@18.2.0)(react@18.2.0):

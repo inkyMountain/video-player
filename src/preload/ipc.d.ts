@@ -1,3 +1,6 @@
+declare namespace SystemInfoIpc {
+  export type PlatformRes = NodeJS.Platform
+}
 declare namespace VideoIpc {
   export interface OpenVideoReq {
     url: string

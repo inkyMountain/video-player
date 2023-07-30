@@ -22,11 +22,14 @@ export function createWindow(options?: { devUrl?: string; url?: string }) {
     height: 1000,
     show: false,
     autoHideMenuBar: true,
-    titleBarStyle: 'customButtonsOnHover',
-    titleBarOverlay: {
-      color: '#ffff00',
-      symbolColor: '#00ffff',
-    },
+    // frame: false,
+    // titleBarStyle: 'customButtonsOnHover',
+    titleBarStyle: 'hidden',
+    titleBarOverlay: false,
+    // titleBarOverlay: {
+    //   color: '#ffff00',
+    //   symbolColor: '#00ffff',
+    // },
     ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
       preload: path.join(__dirname, '../preload/index.js'),

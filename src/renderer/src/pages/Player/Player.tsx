@@ -14,7 +14,7 @@ import NavigationBar from '@renderer/components/NavigationBar/NavigationBar'
 import { MediaConnection, Peer } from 'peerjs'
 import Modal from 'react-modal'
 import usePeerStore from '@renderer/store/peerStore'
-Modal.setAppElement('#root')
+import { Left } from '@icon-park/react'
 
 const VideoPlayer: FC<{}> = () => {
   const videoRef = useRef<
@@ -38,20 +38,21 @@ const VideoPlayer: FC<{}> = () => {
     currentTime: 0,
   })
 
-  const [controlsVisible, setControlsVisible] = useState(false)
+  // const [controlsVisible, setControlsVisible] = useState(false)
+  const [controlsVisible, setControlsVisible] = useState(true)
   const { run: hideControls } = useDebounceFn(
     () => {
-      setControlsVisible(false)
+      // setControlsVisible(false)
     },
     { wait: 1000 },
   )
   useEffect(() => {
     const onMouseMove = () => {
-      setControlsVisible(true)
+      // setControlsVisible(true)
       hideControls()
     }
     const onMouseLeave = () => {
-      setControlsVisible(false)
+      // setControlsVisible(false)
     }
     document.addEventListener('mousemove', onMouseMove)
     document.addEventListener('mouseleave', onMouseLeave)
@@ -138,10 +139,14 @@ const VideoPlayer: FC<{}> = () => {
         console.log('call answer')
       }
     }
-    peerStore.getPeer().on('call', listener)
+    peerStore.getPeer().on?.('call', listener)
     return () => {
-      peerStore.getPeer().off('call', listener)
+      peerStore.getPeer().off?.('call', listener)
     }
+  }, [])
+
+  useEffect(() => {
+    document.title = '分享者'
   }, [])
 
   return (
@@ -183,28 +188,10 @@ const VideoPlayer: FC<{}> = () => {
             pointerEvents: controlsVisible ? 'all' : 'none',
           }}
         >
-          <NavigationBar />
-          {/* <button
-            onClick={() => {
-              console.log('点击共享')
-              const stream = videoRef.current?.captureStream()
-              console.log('获取 video stream ===========>', stream)
-              if (!stream) {
-                return
-              }
-              console.log('call', stream)
-              peer.current?.call(
-                'follower-b161dda5-5521-419f-8bb9-cfcff0934b41',
-                stream,
-              )
-              peer.current?.on('call', (remoteStream) => {
-                console.log('remoteStream ===========>', remoteStream)
-              })
-              // peer.call('b161dda5-5521-419f-8bb9-cfcff0934b41')
-            }}
-          >
-            开始共享
-          </button> */}
+          <NavigationBar
+            style={{ backgroundColor: 'rgba(255, 255, 255, 0.8)' }}
+            backButton={<Left style={{ color: 'whitesmoke' }} />}
+          />
         </header>
 
         <footer
@@ -313,25 +300,22 @@ const VideoPlayer: FC<{}> = () => {
       </div>
 
       <Modal
+        // style={{ content: { inset: 'auto' } }}
         isOpen={shareModalVisible}
         shouldCloseOnEsc={true}
-        style={{
-          content: {
-            backgroundColor: 'whitesmoke',
-          },
-        }}
       >
-        <CopyToClipboard
-          text={peerStore.localPeerId}
-          onCopy={() => {
-            setShareModalVisible(false)
-          }}
-        >
-          <div>
-            <span>{peerStore.localPeerId}</span>
-            <button>复制分享id</button>
-          </div>
-        </CopyToClipboard>
+        <div>复制这个id发送给朋友，ta将看到你的视频画面。</div>
+        <div>
+          {peerStore.localPeerId}
+          <CopyToClipboard
+            text={peerStore.localPeerId}
+            onCopy={() => {
+              setShareModalVisible(false)
+            }}
+          >
+            <button>点击复制</button>
+          </CopyToClipboard>
+        </div>
         <button
           onClick={() => {
             setShareModalVisible(false)

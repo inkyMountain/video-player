@@ -77,6 +77,15 @@ const PlaylistDetail: React.FunctionComponent<IProps> = (props) => {
                 }}
                 key={file.filename}
               >
+                <img
+                  className="video-thumbnail"
+                  src={`thumbnail://${encodeURIComponent(
+                    file.path ?? '',
+                  )}?${new URLSearchParams({
+                    timestamps: JSON.stringify(['50%']),
+                  })}`}
+                  alt=""
+                />
                 <div className="filename">{file.filename}</div>
               </div>
             )
