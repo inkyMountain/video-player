@@ -33,7 +33,6 @@ const protocolMiddleware: AppMiddleware = {
       //   })
       // })
       protocol.registerFileProtocol('local-file', (request, callback) => {
-        console.log('request ==========>', request)
         const requestedFilePath = decodeURIComponent(
           request.url.replace(/^local-file:(\/\/)?/, ''),
         )

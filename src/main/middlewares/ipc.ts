@@ -19,8 +19,6 @@ const ipcMiddleware: AppMiddleware = {
           title: '添加一个包含视频的文件夹',
           properties: ['openDirectory'],
         })
-        console.log('filePaths ==========>', filePaths)
-        console.log('canceled ==========>', canceled)
         if (canceled) {
           return null
         }

@@ -2,6 +2,7 @@ import { globby } from 'globby'
 import ffmpeg from 'fluent-ffmpeg'
 import path from 'path'
 import log from 'electron-log'
+import fsExtra from 'fs-extra'
 
 const setFfmpegAndFfprobePath = () => {
   const ffmpegBinName =
@@ -126,9 +127,15 @@ const generateSubtitle = async (params: {
   const { filePath, subtitleLength, outDir } = params
   const promises: Array<Promise<string>> = []
   for (let i = 0; i < subtitleLength; i++) {
+    const parsedFilePath = path.parse(filePath)
+    const outputPath = path.join(outDir, `${parsedFilePath.name}_${i}.vtt`)
+    const isExist = fsExtra.pathExistsSync(outputPath)
+    if (isExist) {
+      console.log('字幕文件生成，跳过文件', outputPath)
+      promises.push(Promise.resolve(outputPath))
+      continue
+    }
     const promise = new Promise<string>((resolve, reject) => {
-      const parsedFilePath = path.parse(filePath)
-      const outputPath = path.join(outDir, `${parsedFilePath.name}_${i}.vtt`)
       ffmpeg(filePath)
         .outputOption([`-map 0:s:${i}`])
         .output(outputPath)
@@ -137,6 +144,7 @@ const generateSubtitle = async (params: {
           reject(error)
         })
         .once('end', () => {
+          console.log('end ==========>', outputPath)
           resolve(outputPath)
         })
         .run()
