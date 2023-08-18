@@ -1,10 +1,11 @@
-import React, { useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import './Home.scss'
 import usePlaylistStore from '@renderer/store/playlist'
 import { useNavigate } from 'react-router-dom'
 import NavigationBar from '@renderer/components/NavigationBar/NavigationBar'
 import Modal, { Classes } from 'react-modal'
 import useSystemInfoStore from '@renderer/store/systemInfoStore'
+import usePeerStore from '@renderer/store/peerStore'
 
 interface IProps {}
 
@@ -16,15 +17,18 @@ const Home: React.FunctionComponent<IProps> = (props) => {
   const systemInfoStore = useSystemInfoStore()
   const navigate = useNavigate()
   const playlistStore = usePlaylistStore()
+  const peerStore = usePeerStore()
 
   const gotoPlaylistDetailPage = (folderPath: string) => {
     navigate(`/playlist-detail/${encodeURIComponent(folderPath)}`)
   }
 
   const [joinSessionModalVisible, setJoinSessionModalVisible] = useState(false)
+  const sessionModalTarget = useRef<'video' | 'data'>('video')
   const [remotePeerId, setRemotePeerId] = useState('')
 
   const onJoinSessionClick = () => {
+    sessionModalTarget.current = 'video'
     setJoinSessionModalVisible(true)
   }
 
@@ -96,6 +100,15 @@ const Home: React.FunctionComponent<IProps> = (props) => {
 
         <button onClick={onJoinSessionClick}>加入他人分享</button>
 
+        <button
+          onClick={() => {
+            sessionModalTarget.current = 'data'
+            setJoinSessionModalVisible(true)
+          }}
+        >
+          建立数据连接
+        </button>
+
         {systemInfoStore.isDev && (
           <button
             onClick={() => {
@@ -106,6 +119,7 @@ const Home: React.FunctionComponent<IProps> = (props) => {
           </button>
         )}
       </div>
+
       <Modal
         isOpen={joinSessionModalVisible}
         shouldCloseOnEsc={true}
@@ -133,13 +147,29 @@ const Home: React.FunctionComponent<IProps> = (props) => {
         <div>
           <button
             onClick={() => {
-              const search = new URLSearchParams({
-                remotePeerId,
-              }).toString()
-              navigate({
-                pathname: '/video/follower',
-                search,
-              })
+              console.log(
+                'sessionModalTarget.current ===========>',
+                sessionModalTarget.current,
+              )
+              if (sessionModalTarget.current === 'video') {
+                const search = new URLSearchParams({
+                  remotePeerId,
+                }).toString()
+                navigate({
+                  pathname: '/video/follower',
+                  search,
+                })
+              } else {
+                const peer = peerStore.getPeer()
+                // 和远方建立数据连接
+                const connection = peer.connect(remotePeerId)
+                // 把这个连接放到store中，方便后续的使用。
+                peerStore.setDataConnection(connection)
+                // 监听对方发来的消息，并打印出来。
+                connection.on('data', (data) => {
+                  console.log('对方发来消息', data)
+                })
+              }
             }}
           >
             加入会话

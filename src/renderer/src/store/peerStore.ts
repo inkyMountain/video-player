@@ -1,4 +1,4 @@
-import Peer, { PeerErrorType } from 'peerjs'
+import Peer, { DataConnection, PeerErrorType } from 'peerjs'
 import { create } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
 
@@ -6,6 +6,8 @@ interface PeerStore {
   getPeer: () => Peer
   localPeerId: string
   setLocalPeerId: (id: string) => void
+  dataConnection: undefined | DataConnection
+  setDataConnection: (connection: DataConnection) => void
 }
 
 const usePeerStore = create(
@@ -21,6 +23,12 @@ const usePeerStore = create(
           store.localPeerId = id
         })
       },
+      setDataConnection(connection) {
+        set((store) => {
+          store.dataConnection = connection
+        })
+      },
+      dataConnection: undefined,
     }
   }),
 )
@@ -42,6 +50,20 @@ const onError = (error: Error) => {
 peer.on('open', onOpen)
 peer.on('disconnected', onDisconnected)
 peer.on('error', onError)
+// 监听远方的数据连接。
+peer.on('connection', (connection) => {
+  console.log('开始监听数据连接')
+  // 远方向我们发起数据连接时，会触发 connection 事件。
+  // 把连接对象保存到store中。
+  store.setDataConnection(connection)
+  // connection 事件触发时，连接还没建立。需要等连接打开，
+  // 触发 open 事件，连接才算是可用。
+  connection.once('open', () => {
+    console.log('数据连接建立成功')
+    // 发送一个你好，测试是否能成功发送消息。
+    connection.send('你好')
+  })
+})
 
 type PeerJSError = Error & { type: PeerErrorType }
 
