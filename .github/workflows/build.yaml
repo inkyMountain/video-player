@@ -3,7 +3,8 @@ name: Peer Video Player Release
 on:
   push:
     # 只在拥有 v 开头的 tag 时触发 action
-    tags: ['v*']
+    # tags: ['v*']
+    branches: ['master']
 
 jobs:
   build-mac:
@@ -68,7 +69,6 @@ jobs:
 
       - name: Display structure of downloaded files
         run: ls dist -R
-        working-directory: path/to/artifact
 
       - name: Release
         uses: 'marvinpinto/action-automatic-releases@latest'
