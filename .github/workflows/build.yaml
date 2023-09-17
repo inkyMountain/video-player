@@ -23,35 +23,58 @@ jobs:
           pnpm install
           pnpm run build:mac
 
+      - uses: actions/upload-artifact@v3
+        with:
+          name: mac-${{github.ref}}
+          path: dist/*.dmg
+
+  build-windows:
+    permissions: write-all
+    runs-on: windows-2022
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+
+      - name: Build
+        run: |
+          npm i -g pnpm
+          pnpm install
+          pnpm run build:win
+      - uses: actions/upload-artifact@v3
+        with:
+          name: windows-${{github.ref}}
+          path: dist/*.exe
+
+  release:
+    runs-on: ubuntu-22.04
+    permissions: write-all
+    needs: [build-mac, build-windows]
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/download-artifact@v3
+        with:
+          name: mac-${{github.ref}}
+          path: dist
+
+      - uses: actions/download-artifact@v3
+        with:
+          name: windows-${{github.ref}}
+          path: dist
+
+      - name: Display structure of downloaded files
+        run: ls dist -R
+        working-directory: path/to/artifact
+
       - name: Release
         uses: 'marvinpinto/action-automatic-releases@latest'
         with:
           repo_token: '${{ secrets.GITHUB_TOKEN }}'
           prerelease: false
           files: |
+            dist/*.exe
             dist/*.dmg
-
-  # build-windows:
-  #   permissions: write-all
-  #   runs-on: windows-2022
-
-  #   steps:
-  #     - uses: actions/checkout@v3
-
-  #     - uses: actions/setup-node@v3
-  #       with:
-  #         node-version: '16'
-
-  #     - name: Build
-  #       run: |
-  #         npm i -g pnpm
-  #         pnpm install
-  #         pnpm run build:win
-
-  #     - name: Release
-  #       uses: 'marvinpinto/action-automatic-releases@latest'
-  #       with:
-  #         repo_token: '${{ secrets.GITHUB_TOKEN }}'
-  #         prerelease: false
-  #         files: |
-  #           *.exe
