@@ -3,6 +3,7 @@ name: Peer Video Player Release
 on:
   push:
     branches: ['master']
+    tags: ['v*']
 
 jobs:
   build-mac:
@@ -43,7 +44,7 @@ jobs:
         run: |
           npm i -g pnpm
           pnpm install
-          pnpm run build:mac
+          pnpm run build:win
 
       - name: Release
         uses: 'marvinpinto/action-automatic-releases@latest'
