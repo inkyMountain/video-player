@@ -1,6 +1,5 @@
-import { app, net, protocol } from 'electron'
+import { app } from 'electron'
 import { AppMiddleware } from './types'
-import fs from 'fs-extra'
 import { DEFAULT_DEV_URL, createWindow } from '@main/utils/window'
 
 const devWindowMiddleware: AppMiddleware = {

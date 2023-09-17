@@ -1,5 +1,5 @@
 import usePlaylistStore from '@renderer/store/playlist'
-import React, { useEffect } from 'react'
+import React from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import './PlaylistDetail.scss'
 import { useAsyncEffect } from 'ahooks'
@@ -7,7 +7,7 @@ import NavigationBar from '@renderer/components/NavigationBar/NavigationBar'
 
 interface IProps {}
 
-const PlaylistDetail: React.FunctionComponent<IProps> = (props) => {
+const PlaylistDetail: React.FunctionComponent<IProps> = () => {
   const pathParams = useParams<{ folderPath: string }>()
   const navigate = useNavigate()
   const playlistStore = usePlaylistStore()

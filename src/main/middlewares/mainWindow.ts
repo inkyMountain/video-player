@@ -1,9 +1,7 @@
-import { app, net, protocol } from 'electron'
-import { AppMiddleware } from './types'
-import fs from 'fs-extra'
-import { createWindow } from '@main/utils/window'
-import localFileIpc from '@main/ipc-events/localFile'
 import videoIpc from '@main/ipc-events/video'
+import { createWindow } from '@main/utils/window'
+import { app } from 'electron'
+import { AppMiddleware } from './types'
 
 const mainWindowMiddleware: AppMiddleware = {
   when: 'all',

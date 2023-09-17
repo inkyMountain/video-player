@@ -1,4 +1,4 @@
-import Peer, { DataConnection, PeerErrorType } from 'peerjs'
+import Peer, { DataConnection } from 'peerjs'
 import { create } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
 
@@ -11,7 +11,7 @@ interface PeerStore {
 }
 
 const usePeerStore = create(
-  immer<PeerStore>((set, get) => {
+  immer<PeerStore>((set) => {
     return {
       getPeer: () => peer,
       // getPeer: () => {
@@ -43,7 +43,7 @@ const onDisconnected = () => {
   peer.reconnect()
 }
 const onError = (error: Error) => {
-  const errorWithType = error as PeerJSError
+  // const errorWithType = error as PeerJSError
   // errorWithType.type === PeerErrorType.WebRTC
   console.log('peerjs 错误', error)
 }
@@ -65,6 +65,6 @@ peer.on('connection', (connection) => {
   })
 })
 
-type PeerJSError = Error & { type: PeerErrorType }
+// type PeerJSError = Error & { type: PeerErrorType }
 
 export default usePeerStore

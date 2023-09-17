@@ -5,22 +5,22 @@ import './Player.scss'
 // import '@videojs/themes/dist/sea/index.css'
 // import '@videojs/themes/dist/fantasy/index.css'
 // import '@videojs/themes/dist/forest/index.css'
-import { useNavigate, useSearchParams } from 'react-router-dom'
-import classnames from 'classnames'
-import { useImmer } from 'use-immer'
+import { Left } from '@icon-park/react'
+import NavigationBar from '@renderer/components/NavigationBar/NavigationBar'
+import usePeerStore from '@renderer/store/peerStore'
+import usePlaylistStore from '@renderer/store/playlist'
 import {
   useAsyncEffect,
   useDebounceFn,
   useFullscreen,
   useMemoizedFn,
 } from 'ahooks'
+import classnames from 'classnames'
+import { MediaConnection } from 'peerjs'
 import { CopyToClipboard } from 'react-copy-to-clipboard'
-import NavigationBar from '@renderer/components/NavigationBar/NavigationBar'
-import { MediaConnection, Peer } from 'peerjs'
 import Modal from 'react-modal'
-import usePeerStore from '@renderer/store/peerStore'
-import { Left } from '@icon-park/react'
-import usePlaylistStore from '@renderer/store/playlist'
+import { useSearchParams } from 'react-router-dom'
+import { useImmer } from 'use-immer'
 
 const VideoPlayer: FC<{}> = () => {
   const videoRef = useRef<
@@ -36,9 +36,8 @@ const VideoPlayer: FC<{}> = () => {
   //   }
   // }, [])
 
-  const navigate = useNavigate()
-  const [isFullscreen, { enterFullscreen, exitFullscreen, toggleFullscreen }] =
-    useFullscreen(wrapperRef.current, {})
+  // const navigate = useNavigate()
+  const [_, { toggleFullscreen }] = useFullscreen(wrapperRef.current, {})
 
   const [progress, setProgress] = useImmer({
     duration: 0,
@@ -46,7 +45,7 @@ const VideoPlayer: FC<{}> = () => {
   })
 
   // const [controlsVisible, setControlsVisible] = useState(false)
-  const [controlsVisible, setControlsVisible] = useState(true)
+  const [controlsVisible] = useState(true)
   const { run: hideControls } = useDebounceFn(
     () => {
       // setControlsVisible(false)

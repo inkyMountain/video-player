@@ -21,7 +21,7 @@ const usePlaylistStore = create(
 
   // set: 更新 store
   // get：获取 store 的值
-  immer<PlaylistStore>((set, get) => {
+  immer<PlaylistStore>((set) => {
     return {
       playlistLocations: [],
       // 把播放列表文件夹数组，替换成新传入的数组。

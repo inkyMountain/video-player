@@ -1,8 +1,7 @@
-import React, { CSSProperties, ReactNode, useEffect, useState } from 'react'
-import { useLocation, useNavigate } from 'react-router-dom'
-import './NavigationBar.scss'
 import { Left } from '@icon-park/react'
-import { useMount } from 'ahooks'
+import React, { CSSProperties, ReactNode, useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import './NavigationBar.scss'
 
 interface IProps {
   // 让父组件可以调整组件最外层的div样式
@@ -22,7 +21,7 @@ const NavigationBar: React.FunctionComponent<IProps> = (props) => {
     backButtonVisible = true,
     extra,
   } = props
-  const [opacity, setOpacity] = useState(1)
+  const [opacity] = useState(1)
 
   const navigate = useNavigate()
   useEffect(() => {

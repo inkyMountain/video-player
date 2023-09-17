@@ -1,19 +1,19 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react'
-import './Home.scss'
-import usePlaylistStore from '@renderer/store/playlist'
-import { useNavigate } from 'react-router-dom'
 import NavigationBar from '@renderer/components/NavigationBar/NavigationBar'
-import Modal, { Classes } from 'react-modal'
-import useSystemInfoStore from '@renderer/store/systemInfoStore'
 import usePeerStore from '@renderer/store/peerStore'
+import usePlaylistStore from '@renderer/store/playlist'
+import useSystemInfoStore from '@renderer/store/systemInfoStore'
+import React, { useRef, useState } from 'react'
+import Modal from 'react-modal'
+import { useNavigate } from 'react-router-dom'
+import './Home.scss'
 
 interface IProps {}
 
-const isDarkMode = Boolean(
-  window.matchMedia('(prefers-color-scheme: dark)').matches,
-)
+// const isDarkMode = Boolean(
+//   window.matchMedia('(prefers-color-scheme: dark)').matches,
+// )
 
-const Home: React.FunctionComponent<IProps> = (props) => {
+const Home: React.FunctionComponent<IProps> = () => {
   const systemInfoStore = useSystemInfoStore()
   const navigate = useNavigate()
   const playlistStore = usePlaylistStore()

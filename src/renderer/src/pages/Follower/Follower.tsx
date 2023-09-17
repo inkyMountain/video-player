@@ -1,8 +1,8 @@
-import React, { Fragment, useEffect, useRef, useState } from 'react'
 import NavigationBar from '@renderer/components/NavigationBar/NavigationBar'
-import { useMemoizedFn } from 'ahooks'
-import { createEmptyMediaStream } from '@renderer/utils/peer'
 import usePeerStore from '@renderer/store/peerStore'
+import { createEmptyMediaStream } from '@renderer/utils/peer'
+import { useMemoizedFn } from 'ahooks'
+import React, { Fragment, useEffect, useRef } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import './Follower.scss'
 
@@ -11,7 +11,7 @@ import './Follower.scss'
 
 interface IProps {}
 
-const Follower: React.FunctionComponent<IProps> = (props) => {
+const Follower: React.FunctionComponent<IProps> = () => {
   const [params, setSearchParams] = useSearchParams()
   const peerStore = usePeerStore()
   const searchParams = Object.fromEntries(params) as { remotePeerId: string }
@@ -35,7 +35,6 @@ const Follower: React.FunctionComponent<IProps> = (props) => {
     HTMLVideoElement & { captureStream: HTMLCanvasElement['captureStream'] }
   >(null!)
 
-  const [peerIdInputValue, setPeerIdInputValue] = useState('')
   const connectPeer = useMemoizedFn((remotePeerId: string) => {
     return new Promise<void>((resolve, reject) => {
       const call = peerStore

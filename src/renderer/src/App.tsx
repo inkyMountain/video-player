@@ -1,8 +1,8 @@
-import { FC, PropsWithChildren, useEffect } from 'react'
-import './App.scss'
 import { useAsyncEffect } from 'ahooks'
-import usePlaylistStore from './store/playlist'
+import { FC, PropsWithChildren } from 'react'
 import Modal from 'react-modal'
+import './App.scss'
+import usePlaylistStore from './store/playlist'
 
 Modal.setAppElement('#root')
 Modal.defaultStyles.content = {
