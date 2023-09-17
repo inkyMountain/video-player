@@ -29,29 +29,29 @@ jobs:
           repo_token: '${{ secrets.GITHUB_TOKEN }}'
           prerelease: false
           files: |
-            *.dmg
+            dist/*.dmg
 
-  build-windows:
-    permissions: write-all
-    runs-on: windows-2022
+  # build-windows:
+  #   permissions: write-all
+  #   runs-on: windows-2022
 
-    steps:
-      - uses: actions/checkout@v3
+  #   steps:
+  #     - uses: actions/checkout@v3
 
-      - uses: actions/setup-node@v3
-        with:
-          node-version: '16'
+  #     - uses: actions/setup-node@v3
+  #       with:
+  #         node-version: '16'
 
-      - name: Build
-        run: |
-          npm i -g pnpm
-          pnpm install
-          pnpm run build:win
+  #     - name: Build
+  #       run: |
+  #         npm i -g pnpm
+  #         pnpm install
+  #         pnpm run build:win
 
-      - name: Release
-        uses: 'marvinpinto/action-automatic-releases@latest'
-        with:
-          repo_token: '${{ secrets.GITHUB_TOKEN }}'
-          prerelease: false
-          files: |
-            *.exe
+  #     - name: Release
+  #       uses: 'marvinpinto/action-automatic-releases@latest'
+  #       with:
+  #         repo_token: '${{ secrets.GITHUB_TOKEN }}'
+  #         prerelease: false
+  #         files: |
+  #           *.exe
