@@ -2,7 +2,6 @@ name: Peer Video Player Release
 
 on:
   push:
-    branches: ['master']
     # 只在拥有 v 开头的 tag 时触发 action
     tags: ['v*']
 
