@@ -34,11 +34,11 @@ jobs:
           pnpm install adm-zip
           node macUnzip.js
           echo 文件权限列表-加权限前
-          ll ./resources/ffmpeg-binaries
+          ls ./resources/ffmpeg-binaries -l
           chmod +x ./resources/ffmpeg-binaries/ffmpeg-universal
           chmod +x ./resources/ffmpeg-binaries/ffprobe-universal
           echo 文件权限列表-加权限后
-          ll ./resources/ffmpeg-binaries
+          ls ./resources/ffmpeg-binaries -l
 
       # 开始构建
       - name: Build
