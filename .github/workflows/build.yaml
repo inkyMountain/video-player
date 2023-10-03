@@ -3,8 +3,8 @@ name: Peer Video Player Release
 on:
   push:
     # 只在拥有 v 开头的 tag 时触发 action
-    tags: ['v*']
-    # branches: ['master']
+    # tags: ['v*']
+    branches: ['master']
 
 jobs:
   # 构建 mac 安装包
@@ -24,6 +24,21 @@ jobs:
         with:
           # 指定使用 16 版本的 node
           node-version: '16'
+
+      # 开始解压
+      - name: unzipFfmpeg
+        # 解压ffmpeg
+        run: |
+          npm i -g pnpm
+          pnpm install
+          pnpm install adm-zip
+          node macUnzip.js
+          echo 文件权限列表-加权限前
+          ll ./resources/ffmpeg-binaries
+          chmod +x ./resources/ffmpeg-binaries/ffmpeg-universal
+          chmod +x ./resources/ffmpeg-binaries/ffprobe-universal
+          echo 文件权限列表-加权限后
+          ll ./resources/ffmpeg-binaries
 
       # 开始构建
       - name: Build
@@ -53,6 +68,13 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: '16'
+
+      - name: unzipFfmpeg
+        run: |
+          npm i -g pnpm
+          pnpm install
+          pnpm install adm-zip
+          node windowsUnzip.js
 
       - name: Build
         run: |
